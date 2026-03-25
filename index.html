@@ -4,564 +4,1183 @@
 <meta charset="UTF-8">
 <title>Crypto Clicker</title>
 <style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: #020b06;
-    color: #d4ffd9;
-    font-family: Arial, sans-serif;
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-  }
+    :root {
+        --bg: #050712;
+        --panel: rgba(15, 20, 40, 0.9);
+        --accent: #35e6a8;
+        --accent-soft: rgba(53, 230, 168, 0.2);
+        --accent-strong: #35e6ff;
+        --text: #f5f7ff;
+        --muted: #9aa0c2;
+        --danger: #ff4f6b;
+        --purple: #b35cff;
+        --purple-soft: rgba(179, 92, 255, 0.2);
+        --shadow-soft: 0 0 30px rgba(0, 0, 0, 0.6);
+        --radius: 18px;
+    }
 
-  /* LEFT SIDE */
-  .left {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-  }
+    * {
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
-  /* RIGHT SIDE SHOP */
-  .right {
-    width: 380px;
-    background: #03140d;
-    border-left: 3px solid #0f3d2a;
-    overflow-y: auto;
-    padding: 10px;
-    position: relative;
-    z-index: 5;
-  }
+    body {
+        margin: 0;
+        background: radial-gradient(circle at top, #151a33 0, #050712 55%, #02030a 100%);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+    }
 
-  /* BIG COIN */
-  #bigCoin {
-    width: 260px;
-    height: 260px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #00ff66, #00cc55, #006633);
-    box-shadow: 0 0 40px rgba(0, 255, 100, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 80px;
-    font-weight: bold;
-    cursor: pointer;
-    user-select: none;
-    transition: transform 0.05s ease;
-    color: #001b0d;
-    position: relative;
-    z-index: 2;
-  }
-  #bigCoin:active { transform: scale(0.96); }
+    .game-shell {
+        width: 100%;
+        max-width: 1100px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
 
-  #balance {
-    margin-top: 20px;
-    font-size: 32px;
-    font-weight: bold;
-    text-shadow: 0 0 10px #00ff66;
-  }
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
 
-  /* BUFF INDICATOR */
-  #buffStatus {
-    margin-top: 6px;
-    font-size: 14px;
-    color: #7aff9d;
-    text-shadow: 0 0 6px rgba(0,255,100,0.6);
-  }
+    .title-block {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
 
-  /* CURSOR BOTS */
-  .cursorBot {
-    width: 32px;
-    height: 32px;
-    position: absolute;
-    pointer-events: none;
-    z-index: 3;
-  }
-  .cursorBot svg {
-    width: 100%;
-    height: 100%;
-    filter: drop-shadow(0 0 6px #00ff66);
-  }
+    .title-block h1 {
+        margin: 0;
+        font-size: 24px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
 
-  /* SHOP */
-  .shop-title-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-  }
-  .shop-title {
-    font-size: 22px;
-    font-weight: bold;
-    color: #7aff9d;
-    text-shadow: 0 0 10px #00ff66;
-  }
-  #utilitiesBtn {
-    padding: 4px 10px;
-    border-radius: 999px;
-    border: 1px solid #00ff66;
-    background: #041b12;
-    color: #aaffc4;
-    cursor: pointer;
-  }
+    .title-block span {
+        font-size: 12px;
+        color: var(--muted);
+    }
 
-  .item {
-    background: #062016;
-    padding: 8px 10px;
-    border-radius: 10px;
-    margin-bottom: 8px;
-    border: 1px solid #0f3d2a;
-    display: flex;
-    gap: 10px;
-    cursor: pointer;
-  }
-  .item.disabled { opacity: 0.4; cursor: not-allowed; }
+    .nav-buttons {
+        display: flex;
+        gap: 8px;
+    }
 
-  .item-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-  }
+    .nav-btn {
+        border: none;
+        border-radius: 999px;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, rgba(53, 230, 168, 0.12), rgba(53, 230, 255, 0.08));
+        color: var(--text);
+        cursor: pointer;
+        font-size: 13px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04), var(--shadow-soft);
+        transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
 
-  /* UTILITIES PANEL */
-  .utilities-panel {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 420px;
-    height: 100vh;
-    background: radial-gradient(circle at top, #022015, #010806);
-    border-left: 2px solid #00ff66;
-    transform: translateX(100%);
-    transition: transform 0.4s ease;
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-  }
-  .utilities-panel.open { transform: translateX(0); }
+    .nav-btn span.icon {
+        font-size: 14px;
+    }
 
-  .utilities-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-  }
-  .utilities-title {
-    font-size: 18px;
-    font-weight: bold;
-    color: #7aff9d;
-    text-shadow: 0 0 8px #00ff66;
-  }
+    .nav-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 30px rgba(53, 230, 168, 0.35);
+        background: linear-gradient(135deg, rgba(53, 230, 168, 0.2), rgba(53, 230, 255, 0.16));
+    }
 
-  /* GARDEN */
-  .garden-container {
-    flex: 1;
-    border-radius: 12px;
-    border: 1px solid #0f3d2a;
-    background: repeating-linear-gradient(
-      45deg,
-      #02140c 0,
-      #02140c 10px,
-      #031b11 10px,
-      #031b11 20px
-    );
-    padding: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    overflow: auto;
-  }
+    .nav-btn.secondary {
+        background: linear-gradient(135deg, rgba(179, 92, 255, 0.12), rgba(53, 230, 255, 0.06));
+    }
 
-  .garden-row {
-    display: flex;
-    gap: 4px;
-    overflow-x: auto;
-    padding: 2px 0;
-  }
+    .nav-btn.secondary:hover {
+        box-shadow: 0 0 0 1px rgba(179, 92, 255, 0.4), 0 0 30px rgba(179, 92, 255, 0.4);
+        background: linear-gradient(135deg, rgba(179, 92, 255, 0.2), rgba(53, 230, 255, 0.16));
+    }
 
-  .garden-tile {
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    border: 1px solid #0f3d2a;
-    background: #04150e;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+    .nav-btn.danger {
+        background: linear-gradient(135deg, rgba(255, 79, 107, 0.16), rgba(255, 255, 255, 0.02));
+    }
 
-  .tile-emoji {
-    font-size: 24px;
-    image-rendering: pixelated;
-    filter: drop-shadow(0 0 4px rgba(0,255,100,0.4));
-  }
+    .nav-btn.danger:hover {
+        box-shadow: 0 0 0 1px rgba(255, 79, 107, 0.4), 0 0 30px rgba(255, 79, 107, 0.4);
+        background: linear-gradient(135deg, rgba(255, 79, 107, 0.24), rgba(255, 255, 255, 0.04));
+    }
 
-  /* EVOLUTION */
-  .level-0 { background: radial-gradient(circle, #02140c, #020b06); }
-  .level-1 { background: radial-gradient(circle, #063322, #020b06); box-shadow: 0 0 8px rgba(0,255,100,0.3); }
-  .level-2 { background: radial-gradient(circle, #0a4b32, #020b06); box-shadow: 0 0 14px rgba(0,255,100,0.5); }
-  .level-3 { background: radial-gradient(circle, #0f6b44, #020b06); box-shadow: 0 0 20px rgba(0,255,100,0.8); }
+    .main-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+        gap: 16px;
+        align-items: stretch;
+    }
 
-  /* RAINBOW FALLING COIN */
-  .rainbow-coin {
-    position: fixed;
-    top: -60px;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: conic-gradient(
-      from 0deg,
-      #ff0000,
-      #ff7f00,
-      #ffff00,
-      #00ff00,
-      #0000ff,
-      #4b0082,
-      #8f00ff,
-      #ff0000
-    );
-    box-shadow: 0 0 18px rgba(255,255,255,0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    color: #001b0d;
-    cursor: pointer;
-    z-index: 10;
-    animation: rainbowSpin 1.2s linear infinite;
-  }
+    .panel {
+        background: var(--panel);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-soft);
+        padding: 16px 18px;
+        position: relative;
+        overflow: hidden;
+    }
 
-  @keyframes rainbowSpin {
-    0% { filter: hue-rotate(0deg); }
-    100% { filter: hue-rotate(360deg); }
-  }
+    .panel::before {
+        content: "";
+        position: absolute;
+        inset: -40%;
+        background:
+            radial-gradient(circle at 0% 0%, rgba(53, 230, 168, 0.12), transparent 55%),
+            radial-gradient(circle at 100% 0%, rgba(179, 92, 255, 0.12), transparent 55%);
+        opacity: 0.7;
+        pointer-events: none;
+    }
+
+    .panel-inner {
+        position: relative;
+        z-index: 1;
+    }
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 10px;
+    }
+
+    .panel-header h2 {
+        margin: 0;
+        font-size: 15px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .panel-header span {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .crypto-display {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        margin-top: 8px;
+    }
+
+    .world-label {
+        font-size: 12px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .crypto-count {
+        font-size: 32px;
+        font-weight: 600;
+    }
+
+    .crypto-per-sec {
+        font-size: 13px;
+        color: var(--muted);
+    }
+
+    .crypto-coin {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 20%, #ffffff, #d0ffe8 25%, #0f5f3a 60%, #02140c 100%);
+        box-shadow:
+            0 0 0 3px rgba(255, 255, 255, 0.12),
+            0 18px 40px rgba(0, 0, 0, 0.8),
+            0 0 40px rgba(53, 230, 168, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+
+    .crypto-coin.purple {
+        background: radial-gradient(circle at 30% 20%, #ffffff, #f0d6ff 25%, #5b1a8f 60%, #12021f 100%);
+        box-shadow:
+            0 0 0 3px rgba(255, 255, 255, 0.12),
+            0 18px 40px rgba(0, 0, 0, 0.8),
+            0 0 40px rgba(179, 92, 255, 0.7);
+    }
+
+    .crypto-coin::after {
+        content: "₿";
+        font-size: 64px;
+        font-weight: 700;
+        color: rgba(0, 0, 0, 0.75);
+        text-shadow:
+            0 0 10px rgba(255, 255, 255, 0.4),
+            0 0 25px rgba(53, 230, 168, 0.7);
+    }
+
+    .crypto-coin.purple::after {
+        text-shadow:
+            0 0 10px rgba(255, 255, 255, 0.4),
+            0 0 25px rgba(179, 92, 255, 0.9);
+    }
+
+    .crypto-coin:active {
+        transform: scale(0.96) translateY(2px);
+        box-shadow:
+            0 0 0 3px rgba(255, 255, 255, 0.12),
+            0 10px 24px rgba(0, 0, 0, 0.9),
+            0 0 30px rgba(53, 230, 168, 0.9);
+    }
+
+    .click-fx {
+        position: absolute;
+        font-size: 14px;
+        color: var(--accent-strong);
+        pointer-events: none;
+        opacity: 0;
+        transform: translate(-50%, -50%);
+        animation: clickFloat 0.6s ease-out forwards;
+    }
+
+    @keyframes clickFloat {
+        0% { opacity: 1; transform: translate(-50%, -10%); }
+        100% { opacity: 0; transform: translate(-50%, -80%); }
+    }
+
+    .upgrades-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 6px;
+        max-height: 280px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .upgrade-item {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.4));
+        border-radius: 12px;
+        padding: 8px 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .upgrade-main {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .upgrade-name {
+        font-size: 13px;
+    }
+
+    .upgrade-desc {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .upgrade-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+    }
+
+    .upgrade-cost {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .upgrade-owned {
+        font-size: 11px;
+        color: var(--accent);
+    }
+
+    .upgrade-btn {
+        border: none;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        cursor: pointer;
+        background: linear-gradient(135deg, rgba(53, 230, 168, 0.18), rgba(53, 230, 255, 0.12));
+        color: var(--text);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+        transition: background 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .upgrade-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 0 18px rgba(53, 230, 168, 0.5);
+        background: linear-gradient(135deg, rgba(53, 230, 168, 0.26), rgba(53, 230, 255, 0.2));
+    }
+
+    .upgrade-btn:disabled {
+        opacity: 0.4;
+        cursor: default;
+        transform: none;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.4));
+    }
+
+    .status-bar {
+        display: flex;
+        gap: 12px;
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 6px;
+        flex-wrap: wrap;
+    }
+
+    .status-pill {
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .status-pill strong {
+        color: var(--accent);
+        font-weight: 500;
+    }
+
+    .status-pill.purple strong {
+        color: var(--purple);
+    }
+
+    .status-pill.danger strong {
+        color: var(--danger);
+    }
+
+    .overlay {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle at center, #ffffff 0, #f0f0ff 35%, #050712 100%);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        animation: pixelIn 0.45s steps(12) forwards;
+    }
+
+    .overlay.show {
+        display: flex;
+    }
+
+    .overlay-inner {
+        position: relative;
+        width: 100%;
+        max-width: 520px;
+        padding: 24px 20px 26px;
+        border-radius: 20px;
+        background: rgba(5, 7, 18, 0.96);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 40px rgba(0, 0, 0, 0.9);
+        overflow: hidden;
+    }
+
+    .overlay-inner::before {
+        content: "";
+        position: absolute;
+        inset: -40%;
+        background:
+            repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 3px),
+            repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 3px);
+        opacity: 0.35;
+        mix-blend-mode: soft-light;
+        pointer-events: none;
+    }
+
+    .overlay-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .overlay-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .overlay-header h2 {
+        margin: 0;
+        font-size: 16px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .overlay-header span {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .overlay-close {
+        border: none;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 18px;
+        padding: 2px 4px;
+    }
+
+    .ascension-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .ascension-count {
+        font-size: 14px;
+        color: var(--muted);
+    }
+
+    .ascension-count strong {
+        color: var(--accent);
+        font-weight: 600;
+    }
+
+    .ascension-warning {
+        font-size: 11px;
+        color: var(--danger);
+        text-align: center;
+        max-width: 320px;
+    }
+
+    .rainbow-crypto {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background:
+            conic-gradient(from 0deg,
+                #ff4f6b,
+                #ffb347,
+                #ffe45e,
+                #35e6a8,
+                #35e6ff,
+                #b35cff,
+                #ff4f6b);
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        animation: float 2.4s ease-in-out infinite, spinHue 6s linear infinite;
+        box-shadow:
+            0 0 0 3px rgba(255, 255, 255, 0.18),
+            0 0 40px rgba(255, 255, 255, 0.4),
+            0 0 60px rgba(179, 92, 255, 0.7);
+    }
+
+    .rainbow-crypto-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 20%, #ffffff, #fdf2ff 25%, #3b0f5f 60%, #05000a 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .rainbow-crypto-inner::after {
+        content: "₿";
+        font-size: 52px;
+        font-weight: 700;
+        color: rgba(0, 0, 0, 0.8);
+        text-shadow:
+            0 0 10px rgba(255, 255, 255, 0.6),
+            0 0 30px rgba(255, 255, 255, 0.9);
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0); }
+    }
+
+    @keyframes spinHue {
+        0% { filter: hue-rotate(0deg); }
+        100% { filter: hue-rotate(360deg); }
+    }
+
+    @keyframes pixelIn {
+        0% {
+            clip-path: inset(0 0 100% 0);
+            image-rendering: pixelated;
+        }
+        100% {
+            clip-path: inset(0 0 0 0);
+            image-rendering: auto;
+        }
+    }
+
+    @keyframes pixelOut {
+        0% {
+            clip-path: inset(0 0 0 0);
+            image-rendering: auto;
+        }
+        100% {
+            clip-path: inset(0 0 100% 0);
+            image-rendering: pixelated;
+        }
+    }
+
+    .ascension-message {
+        margin-top: 8px;
+        font-size: 11px;
+        color: var(--muted);
+        text-align: center;
+        min-height: 16px;
+    }
+
+    .ascension-message.error {
+        color: var(--danger);
+    }
+
+    .ascension-message.success {
+        color: var(--accent);
+    }
+
+    .worlds-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 8px;
+    }
+
+    .world-card {
+        border-radius: 14px;
+        padding: 10px 12px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.5));
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .world-main {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .world-name {
+        font-size: 13px;
+    }
+
+    .world-status {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .world-status span {
+        font-weight: 600;
+    }
+
+    .world-status span.unlocked {
+        color: var(--accent);
+    }
+
+    .world-status span.locked {
+        color: var(--danger);
+    }
+
+    .world-pill {
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .world-pill.purple {
+        border-color: rgba(179, 92, 255, 0.6);
+        color: var(--purple);
+    }
+
+    .world-select-btn {
+        border: none;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        cursor: pointer;
+        background: linear-gradient(135deg, rgba(53, 230, 168, 0.18), rgba(53, 230, 255, 0.12));
+        color: var(--text);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+        transition: background 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .world-select-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 0 18px rgba(53, 230, 168, 0.5);
+        background: linear-gradient(135deg, rgba(53, 230, 168, 0.26), rgba(53, 230, 255, 0.2));
+    }
+
+    .world-select-btn:disabled {
+        opacity: 0.4;
+        cursor: default;
+        transform: none;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.4));
+    }
+
+    @media (max-width: 800px) {
+        .main-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
 </style>
 </head>
 <body>
+<div class="game-shell">
+    <div class="top-bar">
+        <div class="title-block">
+            <h1>Crypto Clicker</h1>
+            <span>Worlds • Ascension • Pixel‑Portal</span>
+        </div>
+        <div class="nav-buttons">
+            <button class="nav-btn" id="btnUtilities">
+                <span class="icon">🛠</span>
+                <span>Utilities</span>
+            </button>
+            <button class="nav-btn danger" id="btnAscension">
+                <span class="icon">✨</span>
+                <span>Ascension</span>
+            </button>
+            <button class="nav-btn secondary" id="btnWorlds">
+                <span class="icon">🌐</span>
+                <span>Worlds</span>
+            </button>
+        </div>
+    </div>
 
-<div class="left">
-  <div id="bigCoin">₿</div>
-  <div id="balance">0 Crypto</div>
-  <div id="buffStatus"></div>
+    <div class="main-grid">
+        <div class="panel">
+            <div class="panel-inner">
+                <div class="panel-header">
+                    <h2>Crypto Core</h2>
+                    <span id="worldLabel">World 1 • Green Crypto</span>
+                </div>
+                <div class="crypto-display">
+                    <div class="world-label" id="worldStatusLabel">Current World: 1</div>
+                    <div class="crypto-count" id="cryptoCount">0</div>
+                    <div class="crypto-per-sec" id="cryptoPerSec">0 / sec</div>
+                    <div class="crypto-coin" id="cryptoCoin"></div>
+                </div>
+                <div class="status-bar">
+                    <div class="status-pill">
+                        Ascensions: <strong id="ascensionCount">0</strong>
+                    </div>
+                    <div class="status-pill purple">
+                        World 2: <strong id="world2Status">Locked</strong>
+                    </div>
+                    <div class="status-pill">
+                        Timer Miner: <strong id="timerMinerStatus">Not Owned</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-inner">
+                <div class="panel-header">
+                    <h2>Upgrades</h2>
+                    <span>Clickers • Miners • Timer Miner</span>
+                </div>
+                <div class="upgrades-list" id="upgradesList"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="right">
-  <div class="shop-title-row">
-    <div class="shop-title">Crypto Upgrades</div>
-    <button id="utilitiesBtn">Utilities</button>
-  </div>
-  <div id="shop"></div>
+<div class="overlay" id="ascensionOverlay">
+    <div class="overlay-inner">
+        <div class="overlay-content">
+            <div class="overlay-header">
+                <h2>Ascension</h2>
+                <button class="overlay-close" id="ascensionClose">&times;</button>
+            </div>
+            <div class="ascension-center">
+                <div class="ascension-count">
+                    Ascensions: <strong id="ascensionCountOverlay">0</strong>
+                </div>
+                <div class="ascension-warning">
+                    Ascending will reset all coins, upgrades, and world progress.<br>
+                    Only your Ascension count will remain.
+                </div>
+                <div class="rainbow-crypto" id="rainbowCrypto">
+                    <div class="rainbow-crypto-inner"></div>
+                </div>
+                <div class="ascension-message" id="ascensionMessage"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="utilities-panel" id="utilitiesPanel">
-  <div class="utilities-header">
-    <div class="utilities-title">Utilities Garden</div>
-    <button id="closeUtilities">Close</button>
-  </div>
-  <div class="garden-container" id="gardenGrid"></div>
+<div class="overlay" id="worldsOverlay">
+    <div class="overlay-inner">
+        <div class="overlay-content">
+            <div class="overlay-header">
+                <h2>Worlds</h2>
+                <button class="overlay-close" id="worldsClose">&times;</button>
+            </div>
+            <div class="worlds-grid">
+                <div class="world-card">
+                    <div class="world-main">
+                        <div class="world-name">World 1 • Green Crypto</div>
+                        <div class="world-status">
+                            Status: <span class="unlocked">Unlocked</span>
+                        </div>
+                        <div class="world-pill">Base world • Standard upgrades</div>
+                    </div>
+                    <button class="world-select-btn" id="selectWorld1">Enter</button>
+                </div>
+
+                <div class="world-card">
+                    <div class="world-main">
+                        <div class="world-name">World 2 • Purple Crypto</div>
+                        <div class="world-status">
+                            Status:
+                            <span id="world2LockLabel" class="locked">Locked • Requires 2+ Ascensions</span>
+                        </div>
+                        <div class="world-pill purple">Amplified world • Stronger upgrades</div>
+                    </div>
+                    <button class="world-select-btn" id="selectWorld2" disabled>Enter</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-/* STATE */
-let balance = 0;
-let basePerClick = 1;
-let incomeMultiplier = 1; // affects clicks + utilities
-let cursorBots = [];
-let lastUpdateTime = Date.now();
-let gardenStartTime = Date.now();
-let buffTimeoutId = null;
-let rainbowCoinActive = false;
+(function() {
+    const state = {
+        ascensions: 0,
+        currentWorld: 1,
+        worlds: {
+            1: {
+                name: "World 1",
+                color: "green",
+                coins: 0,
+                perClick: 1,
+                perSecond: 0,
+                upgrades: {}
+            },
+            2: {
+                name: "World 2",
+                color: "purple",
+                coins: 0,
+                perClick: 1,
+                perSecond: 0,
+                upgrades: {}
+            }
+        },
+        upgradesConfig: {
+            1: [
+                {
+                    id: "clickBoost",
+                    name: "Click Boost",
+                    desc: "+1 per click",
+                    baseCost: 10,
+                    costMult: 1.5,
+                    type: "click",
+                    value: 1
+                },
+                {
+                    id: "autoMiner",
+                    name: "Auto Miner",
+                    desc: "+1 per second",
+                    baseCost: 50,
+                    costMult: 1.6,
+                    type: "auto",
+                    value: 1
+                },
+                {
+                    id: "timerMiner",
+                    name: "Timer Miner",
+                    desc: "Required to trade for Ascension",
+                    baseCost: 200,
+                    costMult: 1.8,
+                    type: "timer",
+                    value: 0
+                }
+            ],
+            2: [
+                {
+                    id: "clickBoost2",
+                    name: "Quantum Click Boost",
+                    desc: "+3 per click",
+                    baseCost: 100,
+                    costMult: 1.6,
+                    type: "click",
+                    value: 3
+                },
+                {
+                    id: "autoMiner2",
+                    name: "Void Miner",
+                    desc: "+4 per second",
+                    baseCost: 250,
+                    costMult: 1.7,
+                    type: "auto",
+                    value: 4
+                },
+                {
+                    id: "timerMiner",
+                    name: "Timer Miner",
+                    desc: "Required to trade for Ascension",
+                    baseCost: 200,
+                    costMult: 1.8,
+                    type: "timer",
+                    value: 0
+                }
+            ]
+        }
+    };
 
-const SAVE_KEY = "crypto_clicker_pixel_emoji_rainbow_v2";
+    const el = {
+        cryptoCoin: document.getElementById("cryptoCoin"),
+        cryptoCount: document.getElementById("cryptoCount"),
+        cryptoPerSec: document.getElementById("cryptoPerSec"),
+        worldLabel: document.getElementById("worldLabel"),
+        worldStatusLabel: document.getElementById("worldStatusLabel"),
+        ascensionCount: document.getElementById("ascensionCount"),
+        ascensionCountOverlay: document.getElementById("ascensionCountOverlay"),
+        world2Status: document.getElementById("world2Status"),
+        timerMinerStatus: document.getElementById("timerMinerStatus"),
+        upgradesList: document.getElementById("upgradesList"),
+        btnAscension: document.getElementById("btnAscension"),
+        btnWorlds: document.getElementById("btnWorlds"),
+        ascensionOverlay: document.getElementById("ascensionOverlay"),
+        ascensionClose: document.getElementById("ascensionClose"),
+        rainbowCrypto: document.getElementById("rainbowCrypto"),
+        ascensionMessage: document.getElementById("ascensionMessage"),
+        worldsOverlay: document.getElementById("worldsOverlay"),
+        worldsClose: document.getElementById("worldsClose"),
+        selectWorld1: document.getElementById("selectWorld1"),
+        selectWorld2: document.getElementById("selectWorld2"),
+        world2LockLabel: document.getElementById("world2LockLabel")
+    };
 
-/* PRODUCERS */
-let producers = [
-  { name: "Cursor Bot", baseCost: 15, amount: 0, cps: 0.1, emoji: "🖱️" },
-  { name: "Hobby Miner", baseCost: 100, amount: 0, cps: 1, emoji: "⛏️" },
-  { name: "Mining Farm", baseCost: 1100, amount: 0, cps: 8, emoji: "🏭" },
-  { name: "GPU Factory", baseCost: 12000, amount: 0, cps: 47, emoji: "💻" },
-  { name: "Crypto Mine", baseCost: 130000, amount: 0, cps: 260, emoji: "🪨" },
-  { name: "Server Shipment", baseCost: 1400000, amount: 0, cps: 1400, emoji: "📦" },
-  { name: "Hash Lab", baseCost: 20000000, amount: 0, cps: 7800, emoji: "⚗️" },
-  { name: "Quantum Gateway", baseCost: 330000000, amount: 0, cps: 44000, emoji: "🌀" },
-  { name: "Time Miner", baseCost: 5100000000, amount: 0, cps: 260000, emoji: "⏳" }
-];
-
-/* COST */
-function getCost(base, amount) {
-  return Math.floor(base * Math.pow(1.15, amount));
-}
-
-/* UI UPDATE */
-function updateUI() {
-  document.getElementById("balance").textContent = balance.toFixed(1) + " Crypto";
-
-  const shop = document.getElementById("shop");
-  shop.innerHTML = "";
-
-  producers.forEach((p, i) => {
-    const cost = getCost(p.baseCost, p.amount);
-
-    const item = document.createElement("div");
-    item.className = "item" + (balance < cost ? " disabled" : "");
-    item.onclick = () => buyProducer(i);
-
-    const icon = document.createElement("div");
-    icon.className = "item-icon";
-    icon.textContent = p.emoji;
-
-    const text = document.createElement("div");
-    text.innerHTML = `
-      <div style="font-weight:bold;color:#aaffc4">${p.name} (${p.amount})</div>
-      <div style="font-size:12px;color:#7aff9d">Generates ${p.cps} crypto/sec</div>
-      <div style="color:#00ff66;font-weight:bold">Cost: ${cost.toLocaleString()}</div>
-    `;
-
-    item.appendChild(icon);
-    item.appendChild(text);
-    shop.appendChild(item);
-  });
-
-  renderGarden();
-  updateBuffStatus();
-}
-
-/* BUFF STATUS TEXT */
-function updateBuffStatus() {
-  const el = document.getElementById("buffStatus");
-  if (incomeMultiplier > 1) {
-    el.textContent = "Rainbow Boost: 10× clicks & utilities for 30s!";
-  } else {
-    el.textContent = "";
-  }
-}
-
-/* BUY */
-function buyProducer(i) {
-  const p = producers[i];
-  const cost = getCost(p.baseCost, p.amount);
-  if (balance < cost) return;
-
-  balance -= cost;
-  p.amount++;
-
-  if (i === 0) spawnCursorBot();
-
-  updateUI();
-  saveGame();
-}
-
-/* CLICK */
-document.getElementById("bigCoin").onclick = () => {
-  balance += basePerClick * incomeMultiplier;
-  updateUI();
-  saveGame();
-};
-
-/* CURSOR BOTS */
-const cursorSVG = `
-<svg viewBox="0 0 24 24">
-  <path d="M3 2 L20 12 L13 13 L15 22 L10 22 L8 13 L3 2 Z"
-        fill="black" stroke="#00ff66" stroke-width="2"/>
-</svg>`;
-
-function spawnCursorBot() {
-  const bot = document.createElement("div");
-  bot.className = "cursorBot";
-  bot.innerHTML = cursorSVG;
-  document.body.appendChild(bot);
-
-  cursorBots.push({
-    el: bot,
-    angle: Math.random() * Math.PI * 2,
-    radius: 170 + cursorBots.length * 12,
-    speed: 0.01 + Math.random() * 0.01
-  });
-}
-
-function animateBots() {
-  const coin = document.getElementById("bigCoin");
-  const rect = coin.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top + rect.height / 2;
-
-  cursorBots.forEach(bot => {
-    bot.angle += bot.speed;
-    const x = cx + Math.cos(bot.angle) * bot.radius - 16;
-    const y = cy + Math.sin(bot.angle) * bot.radius - 16;
-    bot.el.style.transform = `translate(${x}px, ${y}px)`;
-  });
-
-  requestAnimationFrame(animateBots);
-}
-animateBots();
-
-/* PASSIVE INCOME (AFFECTED BY RAINBOW BUFF) */
-setInterval(() => {
-  const now = Date.now();
-  const delta = (now - lastUpdateTime) / 1000;
-  lastUpdateTime = now;
-
-  let total = 0;
-  producers.forEach(p => total += p.amount * p.cps);
-  balance += total * delta * incomeMultiplier;
-
-  updateUI();
-  saveGame();
-}, 1000);
-
-/* UTILITIES PANEL */
-document.getElementById("utilitiesBtn").onclick = () =>
-  document.getElementById("utilitiesPanel").classList.add("open");
-
-document.getElementById("closeUtilities").onclick = () =>
-  document.getElementById("utilitiesPanel").classList.remove("open");
-
-/* EVOLUTION */
-function getEvolutionLevel() {
-  const minutes = (Date.now() - gardenStartTime) / 60000;
-  return Math.min(3, Math.floor(minutes / 30));
-}
-
-/* GARDEN RENDER */
-function renderGarden() {
-  const grid = document.getElementById("gardenGrid");
-  grid.innerHTML = "";
-
-  const level = getEvolutionLevel();
-
-  producers.forEach(p => {
-    if (p.amount <= 0) return;
-
-    const row = document.createElement("div");
-    row.className = "garden-row";
-
-    for (let i = 0; i < p.amount; i++) {
-      const tile = document.createElement("div");
-      tile.className = "garden-tile level-" + level;
-
-      const emoji = document.createElement("div");
-      emoji.className = "tile-emoji";
-      emoji.textContent = p.emoji;
-
-      tile.appendChild(emoji);
-      row.appendChild(tile);
+    function initWorldUpgrades(worldId) {
+        const world = state.worlds[worldId];
+        if (!world.upgrades || Object.keys(world.upgrades).length === 0) {
+            state.upgradesConfig[worldId].forEach(cfg => {
+                world.upgrades[cfg.id] = {
+                    level: 0,
+                    cost: cfg.baseCost
+                };
+            });
+        }
     }
 
-    grid.appendChild(row);
-  });
-}
-
-/* RAINBOW FALLING COIN LOGIC */
-function spawnRainbowCoin() {
-  if (rainbowCoinActive) return;
-  rainbowCoinActive = true;
-
-  const coin = document.createElement("div");
-  coin.className = "rainbow-coin";
-  coin.textContent = "₿";
-
-  const screenWidth = window.innerWidth;
-  const x = Math.random() * (screenWidth - 60) + 10;
-  coin.style.left = x + "px";
-
-  document.body.appendChild(coin);
-
-  const fallDuration = 4000; // 4 seconds
-  const startTime = performance.now();
-
-  function fallStep(now) {
-    const t = (now - startTime) / fallDuration;
-    if (!document.body.contains(coin)) return;
-
-    const y = t * (window.innerHeight + 80) - 60;
-    coin.style.top = y + "px";
-
-    if (t >= 1) {
-      // fell off screen
-      document.body.removeChild(coin);
-      rainbowCoinActive = false;
-      return;
+    function getCurrentWorld() {
+        return state.worlds[state.currentWorld];
     }
-    requestAnimationFrame(fallStep);
-  }
-  requestAnimationFrame(fallStep);
 
-  coin.addEventListener("click", () => {
-    if (!document.body.contains(coin)) return;
-    document.body.removeChild(coin);
-    rainbowCoinActive = false;
-    triggerRainbowBuff();
-  });
-}
+    function format(num) {
+        if (num >= 1e9) return (num / 1e9).toFixed(2) + "B";
+        if (num >= 1e6) return (num / 1e6).toFixed(2) + "M";
+        if (num >= 1e3) return (num / 1e3).toFixed(2) + "K";
+        return Math.floor(num).toString();
+    }
 
-function triggerRainbowBuff() {
-  incomeMultiplier = 10; // 10x clicks + utilities
-  updateBuffStatus();
+    function updatePerSecond(worldId) {
+        const world = state.worlds[worldId];
+        let perSec = 0;
+        const cfgs = state.upgradesConfig[worldId];
+        cfgs.forEach(cfg => {
+            const up = world.upgrades[cfg.id];
+            if (cfg.type === "auto") {
+                perSec += cfg.value * up.level;
+            }
+        });
+        world.perSecond = perSec;
+    }
 
-  if (buffTimeoutId) clearTimeout(buffTimeoutId);
-  buffTimeoutId = setTimeout(() => {
-    incomeMultiplier = 1;
-    buffTimeoutId = null;
-    updateBuffStatus();
-  }, 30000); // 30 seconds
-}
+    function updatePerClick(worldId) {
+        const world = state.worlds[worldId];
+        let perClick = 1;
+        const cfgs = state.upgradesConfig[worldId];
+        cfgs.forEach(cfg => {
+            const up = world.upgrades[cfg.id];
+            if (cfg.type === "click") {
+                perClick += cfg.value * up.level;
+            }
+        });
+        world.perClick = perClick;
+    }
 
-/* RANDOM SPAWN CHECK: 1 IN 100 CHANCE EVERY SECOND */
-setInterval(() => {
-  const roll = Math.floor(Math.random() * 100); // 0–99
-  if (roll === 0) {
-    spawnRainbowCoin();
-  }
-}, 1000);
+    function hasTimerMiner() {
+        const world = getCurrentWorld();
+        const up = world.upgrades["timerMiner"];
+        return up && up.level > 0;
+    }
 
-/* SAVE / LOAD */
-function saveGame() {
-  localStorage.setItem(SAVE_KEY, JSON.stringify({
-    balance,
-    producers: producers.map(p => p.amount),
-    lastUpdateTime,
-    gardenStartTime
-  }));
-}
+    function updateUI() {
+        const world = getCurrentWorld();
+        el.cryptoCount.textContent = format(world.coins);
+        el.cryptoPerSec.textContent = world.perSecond + " / sec";
+        el.ascensionCount.textContent = state.ascensions;
+        el.ascensionCountOverlay.textContent = state.ascensions;
 
-function loadGame() {
-  const raw = localStorage.getItem(SAVE_KEY);
-  if (!raw) {
-    lastUpdateTime = Date.now();
-    gardenStartTime = Date.now();
-    return;
-  }
-  const data = JSON.parse(raw);
+        const world2Unlocked = state.ascensions >= 2;
+        el.world2Status.textContent = world2Unlocked ? "Unlocked" : "Locked";
+        el.world2Status.style.color = world2Unlocked ? "var(--accent)" : "var(--danger)";
+        el.world2LockLabel.textContent = world2Unlocked ? "Unlocked" : "Locked • Requires 2+ Ascensions";
+        el.world2LockLabel.className = world2Unlocked ? "unlocked" : "locked";
+        el.selectWorld2.disabled = !world2Unlocked;
 
-  balance = data.balance || 0;
-  if (Array.isArray(data.producers)) {
-    data.producers.forEach((amt, i) => {
-      if (producers[i]) producers[i].amount = amt || 0;
-    });
-  }
+        el.timerMinerStatus.textContent = hasTimerMiner() ? "Owned" : "Not Owned";
+        el.timerMinerStatus.style.color = hasTimerMiner() ? "var(--accent)" : "var(--muted)";
 
-  lastUpdateTime = data.lastUpdateTime || Date.now();
-  gardenStartTime = data.gardenStartTime || Date.now();
+        if (state.currentWorld === 1) {
+            el.cryptoCoin.classList.remove("purple");
+            el.worldLabel.textContent = "World 1 • Green Crypto";
+            el.worldStatusLabel.textContent = "Current World: 1";
+        } else {
+            el.cryptoCoin.classList.add("purple");
+            el.worldLabel.textContent = "World 2 • Purple Crypto";
+            el.worldStatusLabel.textContent = "Current World: 2";
+        }
 
-  const delta = (Date.now() - lastUpdateTime) / 1000;
-  let total = 0;
-  producers.forEach(p => total += p.amount * p.cps);
-  balance += total * delta; // offline income (no buff while closed)
+        renderUpgrades();
+    }
 
-  for (let i = 0; i < producers[0].amount; i++) spawnCursorBot();
-}
+    function renderUpgrades() {
+        const worldId = state.currentWorld;
+        const world = state.worlds[worldId];
+        const cfgs = state.upgradesConfig[worldId];
+        el.upgradesList.innerHTML = "";
 
-loadGame();
-updateUI();
+        cfgs.forEach(cfg => {
+            const up = world.upgrades[cfg.id];
+            const item = document.createElement("div");
+            item.className = "upgrade-item";
+
+            const main = document.createElement("div");
+            main.className = "upgrade-main";
+
+            const name = document.createElement("div");
+            name.className = "upgrade-name";
+            name.textContent = cfg.name;
+
+            const desc = document.createElement("div");
+            desc.className = "upgrade-desc";
+            desc.textContent = cfg.desc;
+
+            main.appendChild(name);
+            main.appendChild(desc);
+
+            const meta = document.createElement("div");
+            meta.className = "upgrade-meta";
+
+            const cost = document.createElement("div");
+            cost.className = "upgrade-cost";
+            cost.textContent = "Cost: " + format(up.cost);
+
+            const owned = document.createElement("div");
+            owned.className = "upgrade-owned";
+            owned.textContent = "Owned: " + up.level;
+
+            const btn = document.createElement("button");
+            btn.className = "upgrade-btn";
+            btn.textContent = "Buy";
+            btn.disabled = world.coins < up.cost;
+
+            btn.addEventListener("click", () => {
+                if (world.coins >= up.cost) {
+                    world.coins -= up.cost;
+                    up.level += 1;
+                    up.cost = Math.ceil(up.cost * cfg.costMult);
+
+                    if (cfg.type === "click") {
+                        updatePerClick(worldId);
+                    } else if (cfg.type === "auto") {
+                        updatePerSecond(worldId);
+                    }
+
+                    if (cfg.id === "timerMiner") {
+                        el.timerMinerStatus.textContent = "Owned";
+                        el.timerMinerStatus.style.color = "var(--accent)";
+                    }
+
+                    updateUI();
+                }
+            });
+
+            meta.appendChild(cost);
+            meta.appendChild(owned);
+            meta.appendChild(btn);
+
+            item.appendChild(main);
+            item.appendChild(meta);
+
+            el.upgradesList.appendChild(item);
+        });
+    }
+
+    function spawnClickFx(x, y, amount) {
+        const fx = document.createElement("div");
+        fx.className = "click-fx";
+        fx.textContent = "+" + amount;
+        fx.style.left = x + "px";
+        fx.style.top = y + "px";
+        el.cryptoCoin.appendChild(fx);
+        setTimeout(() => fx.remove(), 600);
+    }
+
+    function tick(deltaSeconds) {
+        Object.keys(state.worlds).forEach(idStr => {
+            const id = parseInt(idStr, 10);
+            const world = state.worlds[id];
+            if (world.perSecond > 0) {
+                world.coins += world.perSecond * deltaSeconds;
+            }
+        });
+        updateUI();
+    }
+
+    let lastTime = performance.now();
+    function loop(now) {
+        const delta = (now - lastTime) / 1000;
+        lastTime = now;
+        tick(delta);
+        requestAnimationFrame(loop);
+    }
+
+    function openAscensionOverlay() {
+        el.ascensionMessage.textContent = "";
+        el.ascensionMessage.className = "ascension-message";
+        el.ascensionOverlay.classList.add("show");
+    }
+
+    function closeAscensionOverlay() {
+        el.ascensionOverlay.classList.remove("show");
+    }
+
+    function openWorldsOverlay() {
+        el.worldsOverlay.classList.add("show");
+    }
+
+    function closeWorldsOverlay() {
+        el.worldsOverlay.classList.remove("show");
+    }
+
+    function performAscension() {
+        if (!hasTimerMiner()) {
+            el.ascensionMessage.textContent = "You need Timer Miner before you can trade for an Ascension.";
+            el.ascensionMessage.className = "ascension-message error";
+            return;
+        }
+
+        state.ascensions += 1;
+
+        Object.keys(state.worlds).forEach(idStr => {
+            const id = parseInt(idStr, 10);
+            const world = state.worlds[id];
+            world.coins = 0;
+            world.perClick = 1;
+            world.perSecond = 0;
+            world.upgrades = {};
+            initWorldUpgrades(id);
+            updatePerClick(id);
+            updatePerSecond(id);
+        });
+
+        state.currentWorld = 1;
+
+        el.ascensionMessage.textContent = "Ascended! All progress reset. Ascensions: " + state.ascensions;
+        el.ascensionMessage.className = "ascension-message success";
+
+        setTimeout(() => {
+            closeAscensionOverlay();
+            updateUI();
+        }, 700);
+    }
+
+    function init() {
+        initWorldUpgrades(1);
+        initWorldUpgrades(2);
+        updatePerClick(1);
+        updatePerSecond(1);
+        updatePerClick(2);
+        updatePerSecond(2);
+        updateUI();
+
+        el.cryptoCoin.addEventListener("click", (e) => {
+            const world = getCurrentWorld();
+            world.coins += world.perClick;
+            const rect = el.cryptoCoin.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            spawnClickFx(x, y, world.perClick);
+            updateUI();
+        });
+
+        el.btnAscension.addEventListener("click", () => {
+            openAscensionOverlay();
+        });
+
+        el.ascensionClose.addEventListener("click", () => {
+            closeAscensionOverlay();
+        });
+
+        el.rainbowCrypto.addEventListener("click", () => {
+            performAscension();
+        });
+
+        el.btnWorlds.addEventListener("click", () => {
+            openWorldsOverlay();
+        });
+
+        el.worldsClose.addEventListener("click", () => {
+            closeWorldsOverlay();
+        });
+
+        el.selectWorld1.addEventListener("click", () => {
+            state.currentWorld = 1;
+            closeWorldsOverlay();
+            updateUI();
+        });
+
+        el.selectWorld2.addEventListener("click", () => {
+            if (state.ascensions >= 2) {
+                state.currentWorld = 2;
+                closeWorldsOverlay();
+                updateUI();
+            }
+        });
+
+        requestAnimationFrame(loop);
+    }
+
+    init();
+})();
 </script>
-
 </body>
 </html>
