@@ -1,633 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Crypto Clicker</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Shortcut icon (you can replace href with your real icon later) -->
-  <link rel="icon" type="image/png" href="icon-crypto-clicker.png" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Original‑style icon (replace with your real path if needed) -->
+  <link rel="icon" type="image/png" href="icon-crypto-clicker.png">
   <style>
-    :root {
-      --bg: #050810;
-      --panel: rgba(10, 18, 40, 0.9);
-      --accent: #35ffb5;
-      --accent-soft: rgba(53, 255, 181, 0.3);
-      --accent-purple: #b35bff;
-      --accent-purple-soft: rgba(179, 91, 255, 0.3);
-      --text-main: #f5f7ff;
-      --text-soft: #9aa4c6;
-      --danger: #ff4b81;
-      --coin-green: #2ee57a;
-      --coin-purple: #c86bff;
-      --coin-rainbow: linear-gradient(135deg, #ff4b81, #ffc857, #35ffb5, #5bc0ff, #b35bff);
-      --border-soft: rgba(255, 255, 255, 0.08);
-      --shadow-soft: 0 0 40px rgba(0, 0, 0, 0.7);
-      --transition-fast: 0.15s ease-out;
-      --transition-med: 0.25s ease-out;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
     body {
-      background: radial-gradient(circle at top, #151b3a 0, #050810 55%, #02030a 100%);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-      padding: 16px;
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #111;
+      color: #eee;
     }
-
-    .game-shell {
-      width: 100%;
-      max-width: 1200px;
-      display: grid;
-      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.4fr);
+    .wrapper {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px;
+      display: flex;
       gap: 16px;
     }
-
-    @media (max-width: 900px) {
-      .game-shell {
-        grid-template-columns: minmax(0, 1fr);
+    @media (max-width: 800px) {
+      .wrapper {
+        flex-direction: column;
       }
     }
-
     .panel {
-      background: var(--panel);
-      border-radius: 18px;
-      border: 1px solid var(--border-soft);
-      box-shadow: var(--shadow-soft);
-      padding: 16px 18px;
-      backdrop-filter: blur(18px);
-      position: relative;
-      overflow: hidden;
+      background: #1b1b1b;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 12px;
+      box-sizing: border-box;
     }
-
-    .panel::before {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      background: radial-gradient(circle at top left, rgba(53, 255, 181, 0.08), transparent 55%);
-      opacity: 0.7;
-      pointer-events: none;
+    .left {
+      flex: 1.2;
     }
-
-    .panel-header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
+    .right {
+      flex: 1;
+    }
+    h1 {
+      margin: 0 0 4px;
+      font-size: 20px;
+    }
+    .subtitle {
+      font-size: 12px;
+      color: #aaa;
       margin-bottom: 10px;
-      position: relative;
-      z-index: 1;
     }
-
-    .panel-title {
-      font-size: 1rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-soft);
-    }
-
-    .panel-sub {
-      font-size: 0.8rem;
-      color: var(--text-soft);
-      opacity: 0.8;
-    }
-
-    .stats-row {
+    .stats {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 12px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .stat-pill {
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border-soft);
-      background: rgba(5, 10, 25, 0.9);
-      font-size: 0.78rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--text-soft);
-    }
-
-    .stat-pill strong {
-      color: var(--text-main);
-      font-weight: 600;
-    }
-
-    .stat-pill.accent {
-      border-color: var(--accent-soft);
-      background: radial-gradient(circle at top, rgba(53, 255, 181, 0.16), rgba(5, 10, 25, 0.95));
-      color: var(--accent);
-    }
-
-    .stat-pill.purple {
-      border-color: var(--accent-purple-soft);
-      background: radial-gradient(circle at top, rgba(179, 91, 255, 0.16), rgba(5, 10, 25, 0.95));
-      color: var(--accent-purple);
-    }
-
-    .big-balance {
-      margin: 8px 0 14px;
-      font-size: 1.6rem;
-      font-weight: 600;
-      display: flex;
-      align-items: baseline;
       gap: 8px;
-      position: relative;
-      z-index: 1;
+      margin-bottom: 10px;
+      font-size: 12px;
     }
-
-    .big-balance span.label {
-      font-size: 0.9rem;
-      color: var(--text-soft);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
+    .stat {
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: #222;
+      border: 1px solid #333;
     }
-
-    .big-balance span.value {
-      font-size: 1.8rem;
-      background: linear-gradient(120deg, #ffffff, #b6ffe2);
-      -webkit-background-clip: text;
-      color: transparent;
+    .stat strong {
+      color: #fff;
     }
-
-    .big-balance.purple span.value {
-      background: linear-gradient(120deg, #ffffff, #e2c4ff);
-      -webkit-background-clip: text;
-      color: transparent;
+    .balance {
+      font-size: 22px;
+      margin-bottom: 10px;
     }
-
-    .coin-button-wrap {
-      position: relative;
-      z-index: 1;
-      margin-bottom: 14px;
+    .balance span.label {
+      font-size: 12px;
+      color: #aaa;
+      margin-right: 6px;
     }
-
     .coin-button {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      max-height: 260px;
-      border-radius: 999px;
-      border: 0;
-      cursor: pointer;
-      background: radial-gradient(circle at 30% 20%, #ffffff, #e5ffe5 25%, #0f3b26 60%, #02060a 100%);
-      box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.08),
-        0 18px 40px rgba(0, 0, 0, 0.9),
-        0 0 40px rgba(53, 255, 181, 0.35);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-    }
-
-    .coin-button.purple {
-      background: radial-gradient(circle at 30% 20%, #ffffff, #f5e5ff 25%, #3a145b 60%, #02010a 100%);
-      box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.08),
-        0 18px 40px rgba(0, 0, 0, 0.9),
-        0 0 40px rgba(179, 91, 255, 0.4);
-    }
-
-    .coin-button.rainbow {
-      background: radial-gradient(circle at 30% 20%, #ffffff, #ffeef5 25%, #2b1035 60%, #02010a 100%);
-      box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.12),
-        0 18px 50px rgba(0, 0, 0, 0.95),
-        0 0 50px rgba(255, 255, 255, 0.5);
-    }
-
-    .coin-button:active {
-      transform: scale(0.97);
-      box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.08),
-        0 10px 26px rgba(0, 0, 0, 0.9);
-    }
-
-    .coin-inner {
-      width: 72%;
-      height: 72%;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 20%, #ffffff, #e5ffe5 25%, #0f3b26 60%, #02060a 100%);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow:
-        inset 0 0 0 2px rgba(255, 255, 255, 0.4),
-        inset 0 0 30px rgba(0, 0, 0, 0.7);
-    }
-
-    .coin-inner.purple {
-      background: radial-gradient(circle at 30% 20%, #ffffff, #f5e5ff 25%, #3a145b 60%, #02010a 100%);
-    }
-
-    .coin-inner.rainbow {
-      background: var(--coin-rainbow);
-      box-shadow:
-        inset 0 0 0 2px rgba(255, 255, 255, 0.6),
-        inset 0 0 40px rgba(0, 0, 0, 0.8);
-    }
-
-    .coin-inner::before {
-      content: "";
-      position: absolute;
-      inset: 12%;
-      border-radius: 50%;
-      border: 2px solid rgba(255, 255, 255, 0.4);
-      box-shadow:
-        0 0 18px rgba(255, 255, 255, 0.3),
-        inset 0 0 18px rgba(0, 0, 0, 0.7);
-      opacity: 0.9;
-    }
-
-    .coin-b {
-      position: relative;
-      font-weight: 800;
-      font-size: 3.2rem;
-      letter-spacing: -0.08em;
-      color: #0b1b14;
-      text-shadow:
-        0 2px 0 rgba(255, 255, 255, 0.7),
-        0 -2px 0 rgba(0, 0, 0, 0.4);
-    }
-
-    .coin-b::before,
-    .coin-b::after {
-      content: "";
-      position: absolute;
-      inset: -6px;
-      border-radius: 12px;
-      border: 3px solid rgba(0, 0, 0, 0.4);
-      opacity: 0.4;
-    }
-
-    .coin-b::after {
-      inset: -2px;
-      border-color: rgba(255, 255, 255, 0.5);
-      opacity: 0.7;
-    }
-
-    .click-float {
-      position: fixed;
-      pointer-events: none;
-      color: #b6ffe2;
-      font-size: 0.9rem;
-      text-shadow: 0 0 10px rgba(53, 255, 181, 0.9);
-      animation: floatUp 0.7s ease-out forwards;
-      z-index: 9999;
-    }
-
-    @keyframes floatUp {
-      0% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(-40px);
-      }
-    }
-
-    .section-label {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: var(--text-soft);
-      margin: 4px 0 6px;
-    }
-
-    .upgrades-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 8px;
-      position: relative;
-      z-index: 1;
-      margin-top: 4px;
-    }
-
-    .upgrade-card {
-      border-radius: 14px;
-      border: 1px solid var(--border-soft);
-      background: radial-gradient(circle at top, rgba(53, 255, 181, 0.08), rgba(5, 10, 25, 0.96));
-      padding: 8px 9px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      cursor: pointer;
-      transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .upgrade-card.purple {
-      background: radial-gradient(circle at top, rgba(179, 91, 255, 0.12), rgba(5, 10, 25, 0.96));
-    }
-
-    .upgrade-card:hover {
-      transform: translateY(-1px);
-      border-color: var(--accent-soft);
-      box-shadow: 0 0 18px rgba(53, 255, 181, 0.25);
-    }
-
-    .upgrade-card.purple:hover {
-      border-color: var(--accent-purple-soft);
-      box-shadow: 0 0 18px rgba(179, 91, 255, 0.25);
-    }
-
-    .upgrade-title-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.82rem;
-    }
-
-    .upgrade-title {
-      font-weight: 600;
-    }
-
-    .upgrade-level {
-      font-size: 0.75rem;
-      color: var(--text-soft);
-    }
-
-    .upgrade-desc {
-      font-size: 0.78rem;
-      color: var(--text-soft);
-    }
-
-    .upgrade-cost {
-      font-size: 0.78rem;
-      margin-top: 2px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: var(--accent);
-    }
-
-    .upgrade-cost span.cost-label {
-      color: var(--text-soft);
-    }
-
-    .upgrade-cost span.cost-value {
-      font-weight: 600;
-    }
-
-    .upgrade-card.disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      box-shadow: none;
-      border-color: rgba(255, 255, 255, 0.04);
-    }
-
-    .upgrade-card.disabled:hover {
-      transform: none;
-      box-shadow: none;
-    }
-
-    .right-panel-section {
-      margin-bottom: 14px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .world-tabs {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 8px;
-    }
-
-    .world-tab {
-      flex: 1;
-      padding: 6px 8px;
-      border-radius: 999px;
-      border: 1px solid var(--border-soft);
-      background: rgba(5, 10, 25, 0.9);
-      font-size: 0.78rem;
-      color: var(--text-soft);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
-    }
-
-    .world-tab span.dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--coin-green);
-      box-shadow: 0 0 8px rgba(53, 255, 181, 0.8);
-    }
-
-    .world-tab.purple span.dot {
-      background: var(--coin-purple);
-      box-shadow: 0 0 8px rgba(179, 91, 255, 0.9);
-    }
-
-    .world-tab.active {
-      background: radial-gradient(circle at top, rgba(53, 255, 181, 0.18), rgba(5, 10, 25, 0.96));
-      border-color: var(--accent-soft);
-      color: var(--accent);
-      box-shadow: 0 0 16px rgba(53, 255, 181, 0.3);
-      transform: translateY(-1px);
-    }
-
-    .world-tab.purple.active {
-      background: radial-gradient(circle at top, rgba(179, 91, 255, 0.22), rgba(5, 10, 25, 0.96));
-      border-color: var(--accent-purple-soft);
-      color: var(--accent-purple);
-      box-shadow: 0 0 16px rgba(179, 91, 255, 0.35);
-    }
-
-    .world-info {
-      font-size: 0.8rem;
-      color: var(--text-soft);
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 6px;
-    }
-
-    .world-info span.value {
-      color: var(--text-main);
-      font-weight: 500;
-    }
-
-    .ascension-panel {
-      border-radius: 14px;
-      border: 1px dashed rgba(255, 255, 255, 0.12);
-      padding: 8px 9px;
-      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.04), rgba(5, 10, 25, 0.96));
-      font-size: 0.8rem;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .ascension-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .ascension-title {
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      font-size: 0.75rem;
-      color: var(--text-soft);
-    }
-
-    .ascension-coins {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.8rem;
-    }
-
-    .ascension-coins span.value {
-      font-weight: 600;
-      color: var(--accent-purple);
-    }
-
-    .ascension-btn {
-      margin-top: 4px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--accent-purple-soft);
-      background: radial-gradient(circle at top, rgba(179, 91, 255, 0.2), rgba(5, 10, 25, 0.96));
-      color: var(--accent-purple);
-      font-size: 0.8rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
-    }
-
-    .ascension-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 16px rgba(179, 91, 255, 0.4);
-      border-color: rgba(255, 255, 255, 0.3);
-    }
-
-    .ascension-btn.disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      box-shadow: none;
-      transform: none;
-    }
-
-    .ascension-note {
-      font-size: 0.75rem;
-      color: var(--text-soft);
-    }
-
-    .rainbow-event-pill {
-      margin-top: 6px;
-      padding: 5px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.12), rgba(5, 10, 25, 0.96));
-      font-size: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-      color: var(--text-soft);
-    }
-
-    .rainbow-event-pill span.badge {
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: var(--coin-rainbow);
-      color: #050810;
-      font-weight: 600;
-      font-size: 0.7rem;
-      box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
-    }
-
-    .rainbow-event-pill span.timer {
-      font-variant-numeric: tabular-nums;
-      color: var(--text-main);
-    }
-
-    .portal-overlay {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-      opacity: 0;
-      transition: opacity 0.4s ease-out;
-    }
-
-    .portal-overlay.active {
-      opacity: 1;
-    }
-
-    .portal-ring {
       width: 220px;
       height: 220px;
       border-radius: 50%;
-      border: 3px solid rgba(255, 255, 255, 0.4);
-      box-shadow:
-        0 0 40px rgba(179, 91, 255, 0.8),
-        0 0 80px rgba(53, 255, 181, 0.7);
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent 60%);
-      animation: portalPulse 0.7s ease-out forwards;
+      border: 3px solid #555;
+      background: radial-gradient(circle at 30% 20%, #fff, #f0f0f0 30%, #c0c0c0 60%, #888 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      font-weight: 700;
+      cursor: pointer;
+      margin: 0 auto 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+      position: relative;
+      overflow: hidden;
     }
-
-    @keyframes portalPulse {
-      0% {
-        transform: scale(0.4);
-        opacity: 0;
-      }
-      50% {
-        transform: scale(1.05);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(1.4);
-        opacity: 0;
-      }
+    .coin-button:active {
+      transform: translateY(2px) scale(0.98);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.6);
     }
-
-    .footer-row {
-      margin-top: 10px;
-      font-size: 0.72rem;
-      color: var(--text-soft);
+    .coin-button.rainbow {
+      background: radial-gradient(circle, #fff 0, #ff9a9e 25%, #fad0c4 40%, #fbc2eb 55%, #a1c4fd 70%, #c2e9fb 85%, #888 100%);
+    }
+    .coin-label {
+      font-size: 14px;
+      text-align: center;
+      margin-bottom: 12px;
+      color: #ccc;
+    }
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin: 10px 0 6px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 3px;
+    }
+    .upgrades {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+    }
+    .upgrade {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 8px;
+      border-radius: 4px;
+      background: #222;
+      border: 1px solid #333;
+      cursor: pointer;
+      transition: background 0.1s ease-out, border-color 0.1s ease-out;
+    }
+    .upgrade.disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    .upgrade:hover:not(.disabled) {
+      background: #262626;
+      border-color: #555;
+    }
+    .upgrade-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .upgrade-icon {
+      width: 22px;
+      text-align: center;
+    }
+    .upgrade-name {
+      font-weight: 600;
+    }
+    .upgrade-level {
+      font-size: 11px;
+      color: #aaa;
+    }
+    .upgrade-right {
+      text-align: right;
+      font-size: 11px;
+    }
+    .upgrade-cost {
+      color: #ffd27f;
+    }
+    .upgrade-prod {
+      color: #9fe89f;
+    }
+    .world-row,
+    .ascension-row,
+    .rainbow-row {
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .world-buttons {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .world-btn {
+      flex: 1;
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid #333;
+      background: #222;
+      color: #ddd;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .world-btn.active {
+      background: #2f4f2f;
+      border-color: #6fdc6f;
+      color: #eaffea;
+    }
+    .world-btn.purple.active {
+      background: #3b2f4f;
+      border-color: #c58cff;
+      color: #f3e6ff;
+    }
+    .ascend-btn {
+      margin-top: 4px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #444;
+      background: #262626;
+      color: #eee;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .ascend-btn.disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    .small-note {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 3px;
+    }
+    .rainbow-pill {
+      margin-top: 4px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid #444;
+      background: #222;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .rainbow-badge {
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: linear-gradient(90deg,#ff9a9e,#fad0c4,#fbc2eb,#a1c4fd,#c2e9fb);
+      color: #111;
+      font-weight: 600;
+      font-size: 10px;
+    }
+    .footer {
+      font-size: 11px;
+      color: #888;
+      margin-top: 8px;
       display: flex;
       justify-content: space-between;
       gap: 8px;
       flex-wrap: wrap;
     }
-
-    .footer-row span {
-      opacity: 0.8;
+    .portal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease-out;
+      z-index: 999;
     }
-
-    .footer-row strong {
-      color: var(--accent);
-      font-weight: 500;
+    .portal-overlay.active {
+      opacity: 1;
+    }
+    .portal-ring {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      border: 3px solid #ccc;
+      box-shadow: 0 0 30px rgba(255,255,255,0.7);
+      animation: portalPulse 0.6s ease-out forwards;
+    }
+    @keyframes portalPulse {
+      0% { transform: scale(0.4); opacity: 0; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+    .float-text {
+      position: fixed;
+      pointer-events: none;
+      color: #9fe89f;
+      font-size: 12px;
+      text-shadow: 0 0 6px rgba(0,0,0,0.8);
+      animation: floatUp 0.6s ease-out forwards;
+      z-index: 1000;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-30px); }
     }
   </style>
 </head>
@@ -636,131 +287,86 @@
     <div class="portal-ring"></div>
   </div>
 
-  <div class="game-shell">
-    <!-- LEFT: Main coin + upgrades -->
-    <div class="panel" id="leftPanel">
-      <div class="panel-header">
-        <div>
-          <div class="panel-title">Crypto Clicker</div>
-          <div class="panel-sub">Idle / clicker • Worlds • Ascension • Auto‑save</div>
-        </div>
-        <div class="panel-sub" id="versionLabel">v1.0</div>
+  <div class="wrapper">
+    <div class="panel left">
+      <h1>Crypto Clicker</h1>
+      <div class="subtitle">Original UI • Worlds • Ascension • Rainbow events</div>
+
+      <div class="stats">
+        <div class="stat">World: <strong id="worldName">Green Chain</strong></div>
+        <div class="stat">Coins / click: <strong id="coinsPerClick">1</strong></div>
+        <div class="stat">Coins / sec: <strong id="coinsPerSec">0</strong></div>
+        <div class="stat">Ascension bonus: <strong id="ascensionBonus">x1.00</strong></div>
       </div>
 
-      <div class="stats-row">
-        <div class="stat-pill accent">
-          <span>World:</span>
-          <strong id="worldNameLabel">Green Chain</strong>
-        </div>
-        <div class="stat-pill">
-          <span>Coins / click:</span>
-          <strong id="coinsPerClickLabel">1</strong>
-        </div>
-        <div class="stat-pill">
-          <span>Coins / sec:</span>
-          <strong id="coinsPerSecLabel">0</strong>
-        </div>
-        <div class="stat-pill purple">
-          <span>Ascension bonus:</span>
-          <strong id="ascensionBonusLabel">x1.00</strong>
-        </div>
+      <div class="balance">
+        <span class="label">Balance:</span>
+        <span id="coinsLabel">0</span>
       </div>
 
-      <div class="big-balance" id="bigBalanceRow">
-        <span class="label">Balance</span>
-        <span class="value" id="coinBalanceLabel">0</span>
+      <button class="coin-button" id="coinButton">
+        B
+      </button>
+
+      <div class="coin-label">
+        Click the coin to earn crypto. Buy upgrades on the right to automate.
       </div>
 
-      <div class="coin-button-wrap">
-        <button class="coin-button" id="coinButton">
-          <div class="coin-inner" id="coinInner">
-            <div class="coin-b">B</div>
-          </div>
-        </button>
+      <div class="section-title">Session</div>
+      <div class="stats">
+        <div class="stat">Playtime: <strong id="playtimeLabel">0s</strong></div>
+        <div class="stat">Total earned: <strong id="totalEarnedLabel">0</strong></div>
       </div>
 
-      <div class="section-label">Upgrades</div>
-      <div class="upgrades-grid" id="upgradesGrid"></div>
-
-      <div class="footer-row">
-        <span>Auto‑save: <strong>ON</strong> (every 5s)</span>
+      <div class="footer">
+        <span id="saveStatus">Auto‑save: ON (every 5s)</span>
         <span id="lastSaveLabel">Last save: —</span>
       </div>
     </div>
 
-    <!-- RIGHT: Worlds, ascension, timers -->
-    <div class="panel" id="rightPanel">
-      <div class="panel-header">
-        <div>
-          <div class="panel-title">Worlds & Ascension</div>
-          <div class="panel-sub">Switch chains • Reset for power • Chase the rainbow</div>
+    <div class="panel right">
+      <div class="section-title">Worlds</div>
+      <div class="world-row">
+        Current multiplier: <strong id="worldMultLabel">x1.00</strong>
+        <div class="world-buttons">
+          <button class="world-btn active" id="worldGreenBtn">Green</button>
+          <button class="world-btn purple" id="worldPurpleBtn">Purple</button>
+        </div>
+        <div class="small-note">
+          Purple world has a higher base multiplier but same original UI.
         </div>
       </div>
 
-      <div class="right-panel-section">
-        <div class="section-label">Worlds</div>
-        <div class="world-tabs">
-          <button class="world-tab active" data-world="green" id="worldTabGreen">
-            <span class="dot"></span>
-            <span>Green Chain</span>
-          </button>
-          <button class="world-tab purple" data-world="purple" id="worldTabPurple">
-            <span class="dot"></span>
-            <span>Purple Chain</span>
-          </button>
-        </div>
-        <div class="world-info">
-          <span>World multiplier: <span class="value" id="worldMultiplierLabel">x1.00</span></span>
-          <span>Timer Miner: <span class="value" id="timerMinerLabel">0 /s</span></span>
+      <div class="section-title">Ascension</div>
+      <div class="ascension-row">
+        Ascension coins: <strong id="ascensionCoinsLabel">0</strong><br>
+        <span class="small-note">
+          Reach 1,000,000 coins to ascend. Ascension resets progress but gives a permanent global bonus.
+        </span>
+        <button class="ascend-btn disabled" id="ascendBtn">Ascend</button>
+        <div class="small-note">
+          Each ascension coin gives +10% to all gains (multiplicative).
         </div>
       </div>
 
-      <div class="right-panel-section">
-        <div class="section-label">Ascension</div>
-        <div class="ascension-panel">
-          <div class="ascension-header-row">
-            <div class="ascension-title">Ascension</div>
-            <div class="ascension-coins">
-              <span>Ascension coins:</span>
-              <span class="value" id="ascensionCoinsLabel">0</span>
-            </div>
-          </div>
-          <div class="ascension-note" id="ascensionNote">
-            Reach <strong>1e6</strong> coins to ascend. Ascension resets your coins and upgrades, but grants a permanent global multiplier.
-          </div>
-          <button class="ascension-btn disabled" id="ascendButton">
-            <span>Ascend</span>
-            <span>⮞</span>
-          </button>
-          <div class="ascension-note">
-            Each ascension coin increases all coin gains by <strong>+10%</strong> multiplicatively.
-          </div>
+      <div class="section-title">Rainbow event</div>
+      <div class="rainbow-row">
+        <div class="rainbow-pill">
+          <span class="rainbow-badge">RAINBOW</span>
+          <span id="rainbowText">Next event in ~60s</span>
+          <span id="rainbowTimer">60</span>
+        </div>
+        <div class="small-note">
+          While active, rainbow multiplies all gains by 5x.
         </div>
       </div>
 
-      <div class="right-panel-section">
-        <div class="section-label">Rainbow event</div>
-        <div class="rainbow-event-pill" id="rainbowEventPill">
-          <span class="badge">RAINBOW</span>
-          <span id="rainbowEventText">Next event in ~60s</span>
-          <span class="timer" id="rainbowEventTimer">60</span>
-        </div>
-      </div>
-
-      <div class="right-panel-section">
-        <div class="section-label">Session</div>
-        <div class="world-info">
-          <span>Playtime: <span class="value" id="playtimeLabel">0s</span></span>
-          <span>Total coins earned: <span class="value" id="totalEarnedLabel">0</span></span>
-        </div>
-      </div>
+      <div class="section-title">Upgrades</div>
+      <div class="upgrades" id="upgradesList"></div>
     </div>
   </div>
 
   <script>
-    // -----------------------------
-    // Core state
-    // -----------------------------
     const SAVE_KEY = "cryptoClickerSave";
     const SAVE_VERSION = 1;
 
@@ -768,9 +374,9 @@
       version: SAVE_VERSION,
       coins: 0,
       totalEarned: 0,
+      playtime: 0,
       ascensionCoins: 0,
       world: "green", // "green" | "purple"
-      playtime: 0,
       upgrades: {},
       rainbow: {
         active: false,
@@ -783,384 +389,263 @@
     };
 
     const worlds = {
-      green: {
-        name: "Green Chain",
-        multiplier: 1,
-        colorClass: "green"
-      },
-      purple: {
-        name: "Purple Chain",
-        multiplier: 3,
-        colorClass: "purple"
-      }
+      green: { name: "Green Chain", multiplier: 1 },
+      purple: { name: "Purple World", multiplier: 3 }
     };
 
     const upgradesConfig = [
-      {
-        id: "clickPower",
-        world: "all",
-        name: "Click Power",
-        desc: "+1 coin per click (base), scales with world & ascension",
-        baseCost: 10,
-        costMult: 1.35,
-        baseEffect: 1
-      },
-      {
-        id: "autoMiner",
-        world: "all",
-        name: "Auto Miner",
-        desc: "Generates coins every second",
-        baseCost: 50,
-        costMult: 1.4,
-        baseEffect: 0.5
-      },
-      {
-        id: "timerMiner",
-        world: "all",
-        name: "Timer Miner",
-        desc: "Generates coins based on playtime",
-        baseCost: 200,
-        costMult: 1.5,
-        baseEffect: 0.2
-      },
-      {
-        id: "greenBoost",
-        world: "green",
-        name: "Green Boost",
-        desc: "Boost coins in Green Chain",
-        baseCost: 150,
-        costMult: 1.5,
-        baseEffect: 0.15
-      },
-      {
-        id: "purpleBoost",
-        world: "purple",
-        name: "Purple Boost",
-        desc: "Boost coins in Purple Chain",
-        baseCost: 300,
-        costMult: 1.6,
-        baseEffect: 0.25
-      }
+      { id: "cursorBot", icon: "🖱️", name: "Cursor Bot", baseCost: 15, costMult: 1.15, baseCps: 0.1 },
+      { id: "hobbyMiner", icon: "⛏️", name: "Hobby Miner", baseCost: 100, costMult: 1.15, baseCps: 1 },
+      { id: "miningFarm", icon: "🏭", name: "Mining Farm", baseCost: 1100, costMult: 1.15, baseCps: 8 },
+      { id: "gpuFactory", icon: "💻", name: "GPU Factory", baseCost: 12000, costMult: 1.15, baseCps: 47 },
+      { id: "cryptoMine", icon: "🪨", name: "Crypto Mine", baseCost: 130000, costMult: 1.15, baseCps: 260 },
+      { id: "serverShipment", icon: "📦", name: "Server Shipment", baseCost: 1400000, costMult: 1.15, baseCps: 1400 },
+      { id: "hashLab", icon: "⚗️", name: "Hash Lab", baseCost: 20000000, costMult: 1.15, baseCps: 7800 },
+      { id: "quantumGateway", icon: "🌀", name: "Quantum Gateway", baseCost: 330000000, costMult: 1.15, baseCps: 44000 },
+      { id: "timeMiner", icon: "⏳", name: "Time Miner", baseCost: 5100000000, costMult: 1.15, baseCps: 260000 }
     ];
 
-    // -----------------------------
-    // Helpers
-    // -----------------------------
+    const coinButton = document.getElementById("coinButton");
+    const coinsLabel = document.getElementById("coinsLabel");
+    const coinsPerClickLabel = document.getElementById("coinsPerClick");
+    const coinsPerSecLabel = document.getElementById("coinsPerSec");
+    const worldNameLabel = document.getElementById("worldName");
+    const worldMultLabel = document.getElementById("worldMultLabel");
+    const ascensionBonusLabel = document.getElementById("ascensionBonus");
+    const ascensionCoinsLabel = document.getElementById("ascensionCoinsLabel");
+    const playtimeLabel = document.getElementById("playtimeLabel");
+    const totalEarnedLabel = document.getElementById("totalEarnedLabel");
+    const upgradesList = document.getElementById("upgradesList");
+    const worldGreenBtn = document.getElementById("worldGreenBtn");
+    const worldPurpleBtn = document.getElementById("worldPurpleBtn");
+    const ascendBtn = document.getElementById("ascendBtn");
+    const rainbowText = document.getElementById("rainbowText");
+    const rainbowTimer = document.getElementById("rainbowTimer");
+    const lastSaveLabel = document.getElementById("lastSaveLabel");
+    const portalOverlay = document.getElementById("portalOverlay");
+
     function formatNumber(n) {
       if (!isFinite(n)) return "∞";
       if (n < 1000) return n.toFixed(0);
-      const units = ["K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
-      let unitIndex = -1;
+      const units = ["K","M","B","T","Qa","Qi","Sx","Sp","Oc","No","Dc"];
+      let u = -1;
       let num = n;
-      while (num >= 1000 && unitIndex < units.length - 1) {
+      while (num >= 1000 && u < units.length - 1) {
         num /= 1000;
-        unitIndex++;
+        u++;
       }
-      return num.toFixed(2) + units[unitIndex];
+      return num.toFixed(2) + units[u];
     }
 
-    function getUpgradeLevel(id) {
+    function getLevel(id) {
       return state.upgrades[id]?.level || 0;
     }
 
-    function getUpgradeCost(id) {
+    function getCost(id) {
       const cfg = upgradesConfig.find(u => u.id === id);
       if (!cfg) return Infinity;
-      const level = getUpgradeLevel(id);
+      const level = getLevel(id);
       return cfg.baseCost * Math.pow(cfg.costMult, level);
     }
 
-    function getAscensionMultiplier() {
+    function getAscensionMult() {
       return Math.pow(1.1, state.ascensionCoins);
     }
 
-    function getWorldMultiplier() {
-      const w = worlds[state.world];
-      return w ? w.multiplier : 1;
+    function getWorldMult() {
+      return worlds[state.world].multiplier;
+    }
+
+    function getRainbowMult() {
+      return state.rainbow.active ? 5 : 1;
     }
 
     function getClickPower() {
       const base = 1;
-      const level = getUpgradeLevel("clickPower");
-      const cfg = upgradesConfig.find(u => u.id === "clickPower");
-      const upgradeBonus = level * (cfg ? cfg.baseEffect : 1);
-      const worldBonus =
-        state.world === "green"
-          ? 1 + getUpgradeLevel("greenBoost") * 0.15
-          : 1 + getUpgradeLevel("purpleBoost") * 0.25;
-      const ascMult = getAscensionMultiplier();
-      const worldMult = getWorldMultiplier();
-      const rainbowMult = state.rainbow.active ? 5 : 1;
-      return (base + upgradeBonus) * worldBonus * ascMult * worldMult * rainbowMult;
+      const asc = getAscensionMult();
+      const worldM = getWorldMult();
+      const rainbowM = getRainbowMult();
+      return base * asc * worldM * rainbowM;
     }
 
-    function getAutoPerSec() {
-      const autoLevel = getUpgradeLevel("autoMiner");
-      const autoCfg = upgradesConfig.find(u => u.id === "autoMiner");
-      const autoBase = autoLevel * (autoCfg ? autoCfg.baseEffect : 0);
-
-      const timerLevel = getUpgradeLevel("timerMiner");
-      const timerCfg = upgradesConfig.find(u => u.id === "timerMiner");
-      const timerBase = timerLevel * (timerCfg ? timerCfg.baseEffect : 0) * (1 + state.playtime / 300);
-
-      const worldBonus =
-        state.world === "green"
-          ? 1 + getUpgradeLevel("greenBoost") * 0.15
-          : 1 + getUpgradeLevel("purpleBoost") * 0.25;
-
-      const ascMult = getAscensionMultiplier();
-      const worldMult = getWorldMultiplier();
-      const rainbowMult = state.rainbow.active ? 5 : 1;
-
-      return (autoBase + timerBase) * worldBonus * ascMult * worldMult * rainbowMult;
-    }
-
-    function randomRange(min, max) {
-      return Math.random() * (max - min) + min;
-    }
-
-    // -----------------------------
-    // DOM refs
-    // -----------------------------
-    const coinButton = document.getElementById("coinButton");
-    const coinInner = document.getElementById("coinInner");
-    const worldNameLabel = document.getElementById("worldNameLabel");
-    const coinsPerClickLabel = document.getElementById("coinsPerClickLabel");
-    const coinsPerSecLabel = document.getElementById("coinsPerSecLabel");
-    const coinBalanceLabel = document.getElementById("coinBalanceLabel");
-    const ascensionBonusLabel = document.getElementById("ascensionBonusLabel");
-    const worldMultiplierLabel = document.getElementById("worldMultiplierLabel");
-    const timerMinerLabel = document.getElementById("timerMinerLabel");
-    const ascensionCoinsLabel = document.getElementById("ascensionCoinsLabel");
-    const ascensionNote = document.getElementById("ascensionNote");
-    const ascendButton = document.getElementById("ascendButton");
-    const rainbowEventPill = document.getElementById("rainbowEventPill");
-    const rainbowEventText = document.getElementById("rainbowEventText");
-    const rainbowEventTimer = document.getElementById("rainbowEventTimer");
-    const playtimeLabel = document.getElementById("playtimeLabel");
-    const totalEarnedLabel = document.getElementById("totalEarnedLabel");
-    const lastSaveLabel = document.getElementById("lastSaveLabel");
-    const worldTabGreen = document.getElementById("worldTabGreen");
-    const worldTabPurple = document.getElementById("worldTabPurple");
-    const portalOverlay = document.getElementById("portalOverlay");
-    const upgradesGrid = document.getElementById("upgradesGrid");
-    const bigBalanceRow = document.getElementById("bigBalanceRow");
-
-    // -----------------------------
-    // UI rendering
-    // -----------------------------
-    function renderWorldTabs() {
-      worldTabGreen.classList.toggle("active", state.world === "green");
-      worldTabPurple.classList.toggle("active", state.world === "purple");
-      worldNameLabel.textContent = worlds[state.world].name;
-
-      const isPurple = state.world === "purple";
-      bigBalanceRow.classList.toggle("purple", isPurple);
-      coinButton.classList.toggle("purple", isPurple && !state.rainbow.active);
-      coinInner.classList.toggle("purple", isPurple && !state.rainbow.active);
-    }
-
-    function renderStats() {
-      coinBalanceLabel.textContent = formatNumber(state.coins);
-      coinsPerClickLabel.textContent = formatNumber(getClickPower());
-      coinsPerSecLabel.textContent = formatNumber(getAutoPerSec());
-      ascensionCoinsLabel.textContent = formatNumber(state.ascensionCoins);
-      ascensionBonusLabel.textContent = "x" + getAscensionMultiplier().toFixed(2);
-      worldMultiplierLabel.textContent = "x" + getWorldMultiplier().toFixed(2);
-
-      const timerLevel = getUpgradeLevel("timerMiner");
-      const timerCfg = upgradesConfig.find(u => u.id === "timerMiner");
-      const timerBase = timerLevel * (timerCfg ? timerCfg.baseEffect : 0) * (1 + state.playtime / 300);
-      timerMinerLabel.textContent = formatNumber(timerBase);
-
-      playtimeLabel.textContent = state.playtime + "s";
-      totalEarnedLabel.textContent = formatNumber(state.totalEarned);
-    }
-
-    function renderAscension() {
-      const threshold = 1e6;
-      const canAscend = state.coins >= threshold;
-      ascendButton.classList.toggle("disabled", !canAscend);
-      ascensionNote.innerHTML =
-        `Reach <strong>${formatNumber(threshold)}</strong> coins to ascend. ` +
-        `Ascension resets your coins and upgrades, but grants a permanent global multiplier.`;
-    }
-
-    function renderRainbow() {
-      if (state.rainbow.active) {
-        rainbowEventText.textContent = "Rainbow active! Massive gains.";
-        rainbowEventTimer.textContent = state.rainbow.remaining.toFixed(0) + "s";
-        coinButton.classList.add("rainbow");
-        coinInner.classList.add("rainbow");
-      } else {
-        rainbowEventText.textContent = "Next event in ~" + state.rainbow.timer.toFixed(0) + "s";
-        rainbowEventTimer.textContent = state.rainbow.timer.toFixed(0);
-        coinButton.classList.remove("rainbow");
-        coinInner.classList.remove("rainbow");
+    function getCps() {
+      let cps = 0;
+      for (const cfg of upgradesConfig) {
+        const level = getLevel(cfg.id);
+        cps += level * cfg.baseCps;
       }
+      const asc = getAscensionMult();
+      const worldM = getWorldMult();
+      const rainbowM = getRainbowMult();
+      return cps * asc * worldM * rainbowM;
     }
 
     function renderUpgrades() {
-      upgradesGrid.innerHTML = "";
-      const currentWorld = state.world;
-
-      const visibleUpgrades = upgradesConfig.filter(u => u.world === "all" || u.world === currentWorld);
-
-      visibleUpgrades.forEach(cfg => {
-        const level = getUpgradeLevel(cfg.id);
-        const cost = getUpgradeCost(cfg.id);
+      upgradesList.innerHTML = "";
+      for (const cfg of upgradesConfig) {
+        const level = getLevel(cfg.id);
+        const cost = getCost(cfg.id);
         const affordable = state.coins >= cost;
 
-        const card = document.createElement("button");
-        card.className = "upgrade-card" + (currentWorld === "purple" ? " purple" : "");
-        if (!affordable) card.classList.add("disabled");
+        const row = document.createElement("div");
+        row.className = "upgrade" + (affordable ? "" : " disabled");
 
-        const titleRow = document.createElement("div");
-        titleRow.className = "upgrade-title-row";
+        const left = document.createElement("div");
+        left.className = "upgrade-left";
 
-        const title = document.createElement("div");
-        title.className = "upgrade-title";
-        title.textContent = cfg.name;
+        const icon = document.createElement("div");
+        icon.className = "upgrade-icon";
+        icon.textContent = cfg.icon;
 
+        const textWrap = document.createElement("div");
+        const nameEl = document.createElement("div");
+        nameEl.className = "upgrade-name";
+        nameEl.textContent = cfg.name;
         const levelEl = document.createElement("div");
         levelEl.className = "upgrade-level";
-        levelEl.textContent = "Lv. " + level;
+        levelEl.textContent = "Level " + level;
+        textWrap.appendChild(nameEl);
+        textWrap.appendChild(levelEl);
 
-        titleRow.appendChild(title);
-        titleRow.appendChild(levelEl);
+        left.appendChild(icon);
+        left.appendChild(textWrap);
 
-        const desc = document.createElement("div");
-        desc.className = "upgrade-desc";
-        desc.textContent = cfg.desc;
+        const right = document.createElement("div");
+        right.className = "upgrade-right";
+        const prodEl = document.createElement("div");
+        prodEl.className = "upgrade-prod";
+        prodEl.textContent = "+" + cfg.baseCps + " crypto/sec each";
+        const costEl = document.createElement("div");
+        costEl.className = "upgrade-cost";
+        costEl.textContent = "Cost: " + formatNumber(cost);
+        right.appendChild(prodEl);
+        right.appendChild(costEl);
 
-        const costRow = document.createElement("div");
-        costRow.className = "upgrade-cost";
+        row.appendChild(left);
+        row.appendChild(right);
 
-        const costLabel = document.createElement("span");
-        costLabel.className = "cost-label";
-        costLabel.textContent = "Cost";
-
-        const costValue = document.createElement("span");
-        costValue.className = "cost-value";
-        costValue.textContent = formatNumber(cost);
-
-        costRow.appendChild(costLabel);
-        costRow.appendChild(costValue);
-
-        card.appendChild(titleRow);
-        card.appendChild(desc);
-        card.appendChild(costRow);
-
-        card.addEventListener("click", () => {
+        row.addEventListener("click", () => {
           if (state.coins >= cost) {
             state.coins -= cost;
-            if (!state.upgrades[cfg.id]) {
-              state.upgrades[cfg.id] = { level: 0 };
-            }
+            if (!state.upgrades[cfg.id]) state.upgrades[cfg.id] = { level: 0 };
             state.upgrades[cfg.id].level++;
             renderAll();
           }
         });
 
-        upgradesGrid.appendChild(card);
-      });
+        upgradesList.appendChild(row);
+      }
     }
 
-    function renderLastSave(timestamp) {
-      if (!timestamp) {
+    function renderWorld() {
+      worldNameLabel.textContent = worlds[state.world].name;
+      worldMultLabel.textContent = "x" + getWorldMult().toFixed(2);
+      worldGreenBtn.classList.toggle("active", state.world === "green");
+      worldPurpleBtn.classList.toggle("active", state.world === "purple");
+    }
+
+    function renderAscension() {
+      ascensionCoinsLabel.textContent = formatNumber(state.ascensionCoins);
+      ascensionBonusLabel.textContent = "x" + getAscensionMult().toFixed(2);
+      const canAscend = state.coins >= 1_000_000;
+      ascendBtn.classList.toggle("disabled", !canAscend);
+    }
+
+    function renderRainbow() {
+      if (state.rainbow.active) {
+        rainbowText.textContent = "Rainbow active! Massive gains.";
+        rainbowTimer.textContent = state.rainbow.remaining.toFixed(0) + "s";
+        coinButton.classList.add("rainbow");
+      } else {
+        rainbowText.textContent = "Next event in ~" + state.rainbow.timer.toFixed(0) + "s";
+        rainbowTimer.textContent = state.rainbow.timer.toFixed(0);
+        coinButton.classList.remove("rainbow");
+      }
+    }
+
+    function renderStats() {
+      coinsLabel.textContent = formatNumber(state.coins);
+      coinsPerClickLabel.textContent = formatNumber(getClickPower());
+      coinsPerSecLabel.textContent = formatNumber(getCps());
+      playtimeLabel.textContent = state.playtime + "s";
+      totalEarnedLabel.textContent = formatNumber(state.totalEarned);
+    }
+
+    function renderLastSave(ts) {
+      if (!ts) {
         lastSaveLabel.textContent = "Last save: —";
         return;
       }
-      const d = new Date(timestamp);
-      const hh = String(d.getHours()).padStart(2, "0");
-      const mm = String(d.getMinutes()).padStart(2, "0");
-      const ss = String(d.getSeconds()).padStart(2, "0");
+      const d = new Date(ts);
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mm = String(d.getMinutes()).padStart(2,"0");
+      const ss = String(d.getSeconds()).padStart(2,"0");
       lastSaveLabel.textContent = `Last save: ${hh}:${mm}:${ss}`;
     }
 
     function renderAll() {
-      renderWorldTabs();
-      renderStats();
+      renderWorld();
       renderAscension();
       renderRainbow();
+      renderStats();
       renderUpgrades();
     }
 
-    // -----------------------------
-    // Portal animation
-    // -----------------------------
     function triggerPortal() {
       portalOverlay.classList.add("active");
       setTimeout(() => {
         portalOverlay.classList.remove("active");
-      }, 650);
+      }, 600);
     }
 
-    // -----------------------------
-    // Click handling
-    // -----------------------------
-    function spawnClickFloat(amount, x, y) {
+    function spawnFloat(amount, x, y) {
       const el = document.createElement("div");
-      el.className = "click-float";
+      el.className = "float-text";
       el.textContent = "+" + formatNumber(amount);
       el.style.left = x + "px";
       el.style.top = y + "px";
       document.body.appendChild(el);
-      setTimeout(() => el.remove(), 700);
+      setTimeout(() => el.remove(), 600);
     }
 
     coinButton.addEventListener("click", e => {
-      const amount = getClickPower();
-      state.coins += amount;
-      state.totalEarned += amount;
-      spawnClickFloat(amount, e.clientX, e.clientY);
+      const gain = getClickPower();
+      state.coins += gain;
+      state.totalEarned += gain;
+      spawnFloat(gain, e.clientX, e.clientY);
       renderStats();
     });
 
-    // -----------------------------
-    // World switching
-    // -----------------------------
-    function switchWorld(worldId) {
-      if (!worlds[worldId]) return;
-      if (state.world === worldId) return;
-      state.world = worldId;
+    worldGreenBtn.addEventListener("click", () => {
+      if (state.world === "green") return;
+      state.world = "green";
       triggerPortal();
       renderAll();
-    }
+    });
 
-    worldTabGreen.addEventListener("click", () => switchWorld("green"));
-    worldTabPurple.addEventListener("click", () => switchWorld("purple"));
-
-    // -----------------------------
-    // Ascension
-    // -----------------------------
-    function performAscension() {
-      const threshold = 1e6;
-      if (state.coins < threshold) return;
-
+    worldPurpleBtn.addEventListener("click", () => {
+      if (state.world === "purple") return;
+      state.world = "purple";
       triggerPortal();
+      renderAll();
+    });
 
+    ascendBtn.addEventListener("click", () => {
+      if (ascendBtn.classList.contains("disabled")) return;
+      triggerPortal();
       const gained = Math.max(1, Math.floor(Math.log10(state.coins) - 5));
       state.ascensionCoins += gained;
-
       state.coins = 0;
       state.totalEarned = 0;
       state.upgrades = {};
       state.world = "green";
-
-      setTimeout(() => {
-        renderAll();
-      }, 200);
-    }
-
-    ascendButton.addEventListener("click", () => {
-      if (ascendButton.classList.contains("disabled")) return;
-      performAscension();
+      setTimeout(renderAll, 200);
     });
 
-    // -----------------------------
-    // Rainbow event
-    // -----------------------------
+    function randomRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
     function resetRainbowCooldown() {
       state.rainbow.timer = randomRange(state.rainbow.cooldownMin, state.rainbow.cooldownMax);
     }
@@ -1181,48 +666,42 @@
       }
     }
 
-    // -----------------------------
-    // Game loop
-    // -----------------------------
     let lastFrame = performance.now();
-
-    function gameLoop(now) {
+    function loop(now) {
       const dt = (now - lastFrame) / 1000;
       lastFrame = now;
 
       state.playtime += Math.max(0, Math.round(dt));
 
-      const autoGain = getAutoPerSec() * dt;
-      if (autoGain > 0) {
-        state.coins += autoGain;
-        state.totalEarned += autoGain;
+      const cps = getCps();
+      const gain = cps * dt;
+      if (gain > 0) {
+        state.coins += gain;
+        state.totalEarned += gain;
       }
 
       tickRainbow(dt);
       renderAll();
 
-      requestAnimationFrame(gameLoop);
+      requestAnimationFrame(loop);
     }
 
-    // -----------------------------
-    // Save / load
-    // -----------------------------
     function saveGame() {
       try {
         const payload = {
           version: SAVE_VERSION,
           coins: state.coins,
           totalEarned: state.totalEarned,
+          playtime: state.playtime,
           ascensionCoins: state.ascensionCoins,
           world: state.world,
-          playtime: state.playtime,
           upgrades: state.upgrades,
           rainbow: state.rainbow
         };
         localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
         renderLastSave(Date.now());
       } catch (e) {
-        console.warn("Save failed:", e);
+        console.warn("Save failed", e);
       }
     }
 
@@ -1232,37 +711,30 @@
         if (!raw) return;
         const data = JSON.parse(raw);
         if (!data || typeof data !== "object") return;
-
-        if (typeof data.version === "number") {
-          state.version = data.version;
-        }
+        if (typeof data.version === "number") state.version = data.version;
         if (typeof data.coins === "number") state.coins = data.coins;
         if (typeof data.totalEarned === "number") state.totalEarned = data.totalEarned;
+        if (typeof data.playtime === "number") state.playtime = data.playtime;
         if (typeof data.ascensionCoins === "number") state.ascensionCoins = data.ascensionCoins;
         if (typeof data.world === "string" && worlds[data.world]) state.world = data.world;
-        if (typeof data.playtime === "number") state.playtime = data.playtime;
         if (data.upgrades && typeof data.upgrades === "object") state.upgrades = data.upgrades;
         if (data.rainbow && typeof data.rainbow === "object") {
           Object.assign(state.rainbow, data.rainbow);
         }
       } catch (e) {
-        console.warn("Load failed:", e);
+        console.warn("Load failed", e);
       }
     }
 
-    // Auto‑save every 5 seconds
     setInterval(saveGame, 5000);
 
-    // -----------------------------
-    // Init
-    // -----------------------------
     function init() {
       loadGame();
       resetRainbowCooldown();
       renderAll();
       renderLastSave(null);
       lastFrame = performance.now();
-      requestAnimationFrame(gameLoop);
+      requestAnimationFrame(loop);
     }
 
     init();
