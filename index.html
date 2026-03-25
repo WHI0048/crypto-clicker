@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Crypto Clicker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Original-style icon (replace path if needed) -->
   <link rel="icon" type="image/png" href="icon-crypto-clicker.png">
   <style>
     body {
@@ -14,26 +13,11 @@
       color: #eee;
     }
     .wrapper {
-      max-width: 1100px;
+      max-width: 900px;
       margin: 0 auto;
       padding: 16px;
-      display: flex;
-      gap: 16px;
       box-sizing: border-box;
     }
-    @media (max-width: 800px) {
-      .wrapper { flex-direction: column; }
-    }
-    .panel {
-      background: #1b1b1b;
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 12px;
-      box-sizing: border-box;
-    }
-    .left { flex: 1.2; }
-    .right { flex: 1; }
-
     h1 {
       margin: 0 0 4px;
       font-size: 20px;
@@ -43,122 +27,67 @@
       color: #aaa;
       margin-bottom: 10px;
     }
-
-    .stats {
+    .top-row {
       display: flex;
+      justify-content: space-between;
+      gap: 12px;
       flex-wrap: wrap;
-      gap: 8px;
       margin-bottom: 10px;
-      font-size: 12px;
-    }
-    .stat {
-      padding: 4px 8px;
-      border-radius: 4px;
-      background: #222;
-      border: 1px solid #333;
-    }
-    .stat strong { color: #fff; }
-
-    .balance {
-      font-size: 22px;
-      margin-bottom: 10px;
-    }
-    .balance .label {
-      font-size: 12px;
-      color: #aaa;
-      margin-right: 6px;
-    }
-
-    .coin-button {
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      border: 3px solid #555;
-      background: #e0e0e0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 64px;
-      font-weight: 700;
-      cursor: pointer;
-      margin: 0 auto 12px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.6);
-      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out, background 0.1s;
-      color: #333;
-    }
-    .coin-button:active {
-      transform: translateY(2px) scale(0.98);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.6);
-    }
-    .coin-button.rainbow {
-      background: #f5e1ff;
-    }
-
-    .coin-label {
       font-size: 13px;
-      text-align: center;
-      margin-bottom: 12px;
-      color: #ccc;
     }
+    .top-block {
+      padding: 6px 8px;
+      background: #1b1b1b;
+      border: 1px solid #333;
+      border-radius: 4px;
+    }
+    .label {
+      color: #aaa;
+      margin-right: 4px;
+    }
+    .main-row {
+      display: flex;
+      gap: 16px;
+    }
+    @media (max-width: 800px) {
+      .main-row { flex-direction: column; }
+    }
+    .panel {
+      background: #1b1b1b;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    .left { flex: 1; }
+    .right { flex: 1; }
 
     .section-title {
       font-size: 13px;
       font-weight: 600;
-      margin: 10px 0 6px;
+      margin: 8px 0 4px;
       border-bottom: 1px solid #333;
-      padding-bottom: 3px;
+      padding-bottom: 2px;
     }
 
-    .upgrades {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      font-size: 13px;
-    }
-    .upgrade {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 8px;
+    .click-button {
+      display: inline-block;
+      padding: 6px 10px;
       border-radius: 4px;
+      border: 1px solid #444;
       background: #222;
-      border: 1px solid #333;
+      color: #eee;
+      font-size: 13px;
       cursor: pointer;
-      transition: background 0.1s, border-color 0.1s;
+      margin-bottom: 6px;
     }
-    .upgrade.disabled {
-      opacity: 0.5;
-      cursor: default;
-    }
-    .upgrade:hover:not(.disabled) {
+    .click-button:active {
       background: #262626;
-      border-color: #555;
     }
-    .upgrade-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .upgrade-icon {
-      width: 22px;
-      text-align: center;
-    }
-    .upgrade-name { font-weight: 600; }
-    .upgrade-level {
-      font-size: 11px;
-      color: #aaa;
-    }
-    .upgrade-right {
-      text-align: right;
-      font-size: 11px;
-    }
-    .upgrade-cost { color: #ffd27f; }
-    .upgrade-prod { color: #9fe89f; }
 
-    .small-note {
-      font-size: 11px;
-      color: #aaa;
-      margin-top: 3px;
+    .stats-line {
+      font-size: 12px;
+      margin: 2px 0;
     }
 
     .world-row,
@@ -232,6 +161,75 @@
       font-size: 10px;
     }
 
+    .small-note {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 3px;
+    }
+
+    .upgrades {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+    }
+    .upgrade {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 6px;
+      border-radius: 4px;
+      background: #222;
+      border: 1px solid #333;
+      cursor: pointer;
+      transition: background 0.1s, border-color 0.1s;
+    }
+    .upgrade.disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    .upgrade:hover:not(.disabled) {
+      background: #262626;
+      border-color: #555;
+    }
+    .upgrade-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .upgrade-icon {
+      width: 20px;
+      text-align: center;
+    }
+    .upgrade-name { font-weight: 600; }
+    .upgrade-level {
+      font-size: 11px;
+      color: #aaa;
+    }
+    .upgrade-right {
+      text-align: right;
+      font-size: 11px;
+    }
+    .upgrade-cost { color: #ffd27f; }
+    .upgrade-prod { color: #9fe89f; }
+
+    .util-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .util-btn {
+      flex: 1;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #444;
+      background: #222;
+      color: #eee;
+      font-size: 12px;
+      text-align: center;
+      cursor: pointer;
+    }
+
     .footer {
       font-size: 11px;
       color: #888;
@@ -256,11 +254,11 @@
     }
     .portal-overlay.active { opacity: 1; }
     .portal-ring {
-      width: 180px;
-      height: 180px;
+      width: 140px;
+      height: 140px;
       border-radius: 50%;
       border: 3px solid #ccc;
-      box-shadow: 0 0 30px rgba(255,255,255,0.7);
+      box-shadow: 0 0 20px rgba(255,255,255,0.7);
       animation: portalPulse 0.6s ease-out forwards;
     }
     @keyframes portalPulse {
@@ -290,81 +288,93 @@
   </div>
 
   <div class="wrapper">
-    <!-- LEFT: original-style main panel -->
-    <div class="panel left">
-      <h1>Crypto Clicker</h1>
-      <div class="subtitle">Original UI • Worlds • Ascension • Rainbow events</div>
+    <h1>Crypto Clicker</h1>
+    <div class="subtitle">Original-style UI • Worlds • Ascension • Rainbow events</div>
 
-      <div class="stats">
-        <div class="stat">World: <strong id="worldName">Green Chain</strong></div>
-        <div class="stat">Coins / click: <strong id="coinsPerClick">1</strong></div>
-        <div class="stat">Coins / sec: <strong id="coinsPerSec">0</strong></div>
-        <div class="stat">Ascension bonus: <strong id="ascensionBonus">x1.00</strong></div>
-      </div>
-
-      <div class="balance">
+    <div class="top-row">
+      <div class="top-block">
         <span class="label">Balance:</span>
-        <span id="coinsLabel">0</span>
+        <span id="coinsLabel">0</span> Crypto
       </div>
-
-      <button class="coin-button" id="coinButton">B</button>
-
-      <div class="coin-label">
-        Click the coin to earn crypto. Buy upgrades on the right to automate.
+      <div class="top-block">
+        <span class="label">Per click:</span>
+        <span id="coinsPerClick">1</span>
       </div>
-
-      <div class="section-title">Session</div>
-      <div class="stats">
-        <div class="stat">Playtime: <strong id="playtimeLabel">0s</strong></div>
-        <div class="stat">Total earned: <strong id="totalEarnedLabel">0</strong></div>
+      <div class="top-block">
+        <span class="label">Per second:</span>
+        <span id="coinsPerSec">0</span>
       </div>
-
-      <div class="footer">
-        <span id="saveStatus">Auto‑save: ON (every 5s)</span>
-        <span id="lastSaveLabel">Last save: —</span>
+      <div class="top-block">
+        <span class="label">World:</span>
+        <span id="worldName">Green Chain</span>
+      </div>
+      <div class="top-block">
+        <span class="label">Ascension bonus:</span>
+        <span id="ascensionBonus">x1.00</span>
       </div>
     </div>
 
-    <!-- RIGHT: worlds + ascension + rainbow + original upgrades -->
-    <div class="panel right">
-      <div class="section-title">Worlds</div>
-      <div class="world-row">
-        Current multiplier: <strong id="worldMultLabel">x1.00</strong>
-        <div class="world-buttons">
-          <button class="world-btn active" id="worldGreenBtn">Green</button>
-          <button class="world-btn purple" id="worldPurpleBtn">Purple</button>
+    <div class="main-row">
+      <div class="panel left">
+        <div class="section-title">Crypto</div>
+
+        <button class="click-button" id="clickBtn">Mine crypto</button>
+
+        <div class="stats-line">Playtime: <span id="playtimeLabel">0s</span></div>
+        <div class="stats-line">Total earned: <span id="totalEarnedLabel">0</span></div>
+
+        <div class="section-title">Utilities</div>
+        <div class="util-row">
+          <button class="util-btn">Utilities</button>
+          <button class="util-btn">Garden</button>
         </div>
-        <div class="small-note">
-          Purple world has a higher base multiplier but keeps the same UI.
+
+        <div class="footer">
+          <span id="saveStatus">Auto-save: ON (every 5s)</span>
+          <span id="lastSaveLabel">Last save: —</span>
         </div>
       </div>
 
-      <div class="section-title">Ascension</div>
-      <div class="ascension-row">
-        Ascension coins: <strong id="ascensionCoinsLabel">0</strong><br>
-        <span class="small-note">
-          Reach 1,000,000 coins to ascend. Ascension resets progress but gives a permanent global bonus.
-        </span>
-        <button class="ascend-btn disabled" id="ascendBtn">Ascend</button>
-        <div class="small-note">
-          Each ascension coin gives +10% to all gains (multiplicative).
+      <div class="panel right">
+        <div class="section-title">Worlds</div>
+        <div class="world-row">
+          Current multiplier: <strong id="worldMultLabel">x1.00</strong>
+          <div class="world-buttons">
+            <button class="world-btn active" id="worldGreenBtn">Green</button>
+            <button class="world-btn purple" id="worldPurpleBtn">Purple</button>
+          </div>
+          <div class="small-note">
+            Purple world has a higher base multiplier but same simple UI.
+          </div>
         </div>
-      </div>
 
-      <div class="section-title">Rainbow event</div>
-      <div class="rainbow-row">
-        <div class="rainbow-pill">
-          <span class="rainbow-badge">RAINBOW</span>
-          <span id="rainbowText">Next event in ~60s</span>
-          <span id="rainbowTimer">60</span>
+        <div class="section-title">Ascension</div>
+        <div class="ascension-row">
+          Ascension coins: <strong id="ascensionCoinsLabel">0</strong><br>
+          <span class="small-note">
+            Reach 1,000,000 coins to ascend. Ascension resets progress but gives a permanent global bonus.
+          </span>
+          <button class="ascend-btn disabled" id="ascendBtn">Ascend</button>
+          <div class="small-note">
+            Each ascension coin gives +10% to all gains (multiplicative).
+          </div>
         </div>
-        <div class="small-note">
-          While active, rainbow multiplies all gains by 5x.
-        </div>
-      </div>
 
-      <div class="section-title">Upgrades</div>
-      <div class="upgrades" id="upgradesList"></div>
+        <div class="section-title">Rainbow event</div>
+        <div class="rainbow-row">
+          <div class="rainbow-pill">
+            <span class="rainbow-badge">RAINBOW</span>
+            <span id="rainbowText">Next event in ~60s</span>
+            <span id="rainbowTimer">60</span>
+          </div>
+          <div class="small-note">
+            While active, rainbow multiplies all gains by 5x.
+          </div>
+        </div>
+
+        <div class="section-title">Upgrades</div>
+        <div class="upgrades" id="upgradesList"></div>
+      </div>
     </div>
   </div>
 
@@ -378,7 +388,7 @@
       totalEarned: 0,
       playtime: 0,
       ascensionCoins: 0,
-      world: "green", // "green" | "purple"
+      world: "green",
       upgrades: {},
       rainbow: {
         active: false,
@@ -395,7 +405,6 @@
       purple: { name: "Purple World", multiplier: 3 }
     };
 
-    // Original upgrade list + costs (classic cookie-style scaling)
     const upgradesConfig = [
       { id: "cursorBot", icon: "🖱️", name: "Cursor Bot", baseCost: 15, costMult: 1.15, baseCps: 0.1 },
       { id: "hobbyMiner", icon: "⛏️", name: "Hobby Miner", baseCost: 100, costMult: 1.15, baseCps: 1 },
@@ -408,7 +417,7 @@
       { id: "timeMiner", icon: "⏳", name: "Time Miner", baseCost: 5100000000, costMult: 1.15, baseCps: 260000 }
     ];
 
-    const coinButton = document.getElementById("coinButton");
+    const clickBtn = document.getElementById("clickBtn");
     const coinsLabel = document.getElementById("coinsLabel");
     const coinsPerClickLabel = document.getElementById("coinsPerClick");
     const coinsPerSecLabel = document.getElementById("coinsPerSec");
@@ -552,11 +561,9 @@
       if (state.rainbow.active) {
         rainbowText.textContent = "Rainbow active! Massive gains.";
         rainbowTimer.textContent = state.rainbow.remaining.toFixed(0) + "s";
-        coinButton.classList.add("rainbow");
       } else {
         rainbowText.textContent = "Next event in ~" + state.rainbow.timer.toFixed(0) + "s";
         rainbowTimer.textContent = state.rainbow.timer.toFixed(0);
-        coinButton.classList.remove("rainbow");
       }
     }
 
@@ -605,7 +612,7 @@
       setTimeout(() => el.remove(), 600);
     }
 
-    coinButton.addEventListener("click", e => {
+    clickBtn.addEventListener("click", e => {
       const gain = getClickPower();
       state.coins += gain;
       state.totalEarned += gain;
