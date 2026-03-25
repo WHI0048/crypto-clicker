@@ -1,604 +1,568 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Crypto Clicker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Crypto Clicker</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #020b06;
+    color: #d4ffd9;
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #111;
-            color: #eee;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+  /* LEFT SIDE */
+  .left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-        #gameContainer {
-            width: 1000px;
-            max-width: 100%;
-            height: 600px;
-            max-height: 100%;
-            background: #1b1b1b;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.6);
-            display: grid;
-            grid-template-columns: 1.2fr 1.8fr;
-            grid-template-rows: auto 1fr;
-            grid-template-areas:
-                "topbar topbar"
-                "left right";
-            padding: 10px;
-            box-sizing: border-box;
-        }
+  /* RIGHT SIDE SHOP */
+  .right {
+    width: 380px;
+    background: #03140d;
+    border-left: 3px solid #0f3d2a;
+    overflow-y: auto;
+    padding: 10px;
+    position: relative;
+    z-index: 5;
+  }
 
-        #topBar {
-            grid-area: topbar;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
+  /* BIG COIN */
+  #bigCoin {
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #00ff66, #00cc55, #006633);
+    box-shadow: 0 0 40px rgba(0, 255, 100, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.05s ease;
+    color: #001b0d;
+    position: relative;
+    z-index: 2;
+  }
+  #bigCoin:active { transform: scale(0.96); }
 
-        #title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #3aa655;
-        }
+  #balance {
+    margin-top: 20px;
+    font-size: 32px;
+    font-weight: bold;
+    text-shadow: 0 0 10px #00ff66;
+  }
 
-        #stats {
-            font-size: 14px;
-        }
+  /* BUFF INDICATOR */
+  #buffStatus {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #7aff9d;
+    text-shadow: 0 0 6px rgba(0,255,100,0.6);
+  }
 
-        #rightButtons {
-            display: flex;
-            gap: 8px;
-        }
+  /* CURSOR BOTS */
+  .cursorBot {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .cursorBot svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 6px #00ff66);
+  }
 
-        .nav-btn {
-            background-color: #3aa655;
-            border: none;
-            padding: 6px 12px;
-            color: white;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-        }
+  /* SHOP */
+  .shop-title-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .shop-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #7aff9d;
+    text-shadow: 0 0 10px #00ff66;
+  }
+  #utilitiesBtn {
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid #00ff66;
+    background: #041b12;
+    color: #aaffc4;
+    cursor: pointer;
+  }
 
-        .nav-btn:hover {
-            background-color: #2e7d42;
-        }
+  .item {
+    background: #062016;
+    padding: 8px 10px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    border: 1px solid #0f3d2a;
+    display: flex;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .item.disabled { opacity: 0.4; cursor: not-allowed; }
 
-        .nav-btn.danger {
-            background-color: #b53a3a;
-        }
+  .item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
 
-        .nav-btn.danger:hover {
-            background-color: #8d2c2c;
-        }
+  /* UTILITIES PANEL */
+  .utilities-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    height: 100vh;
+    background: radial-gradient(circle at top, #022015, #010806);
+    border-left: 2px solid #00ff66;
+    transform: translateX(100%);
+    transition: transform 0.4s ease;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+  }
+  .utilities-panel.open { transform: translateX(0); }
 
-        .nav-btn.secondary {
-            background-color: #3a6ba6;
-        }
+  .utilities-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .utilities-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #7aff9d;
+    text-shadow: 0 0 8px #00ff66;
+  }
 
-        .nav-btn.secondary:hover {
-            background-color: #2c4f7d;
-        }
+  /* GARDEN */
+  .garden-container {
+    flex: 1;
+    border-radius: 12px;
+    border: 1px solid #0f3d2a;
+    background: repeating-linear-gradient(
+      45deg,
+      #02140c 0,
+      #02140c 10px,
+      #031b11 10px,
+      #031b11 20px
+    );
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow: auto;
+  }
 
-        #leftPanel {
-            grid-area: left;
-            border-right: 1px solid #333;
-            padding-right: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+  .garden-row {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding: 2px 0;
+  }
 
-        #rightPanel {
-            grid-area: right;
-            padding-left: 10px;
-            display: flex;
-            flex-direction: column;
-        }
+  .garden-tile {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: 1px solid #0f3d2a;
+    background: #04150e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-        #coin {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #6bff9a, #1f5f32);
-            border: 4px solid #3aa655;
-            box-shadow: 0 0 20px rgba(58,166,85,0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 48px;
-            font-weight: bold;
-            color: #0b1a0f;
-            cursor: pointer;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            user-select: none;
-        }
+  .tile-emoji {
+    font-size: 24px;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 0 4px rgba(0,255,100,0.4));
+  }
 
-        #coin:active {
-            transform: scale(0.97);
-        }
+  /* EVOLUTION */
+  .level-0 { background: radial-gradient(circle, #02140c, #020b06); }
+  .level-1 { background: radial-gradient(circle, #063322, #020b06); box-shadow: 0 0 8px rgba(0,255,100,0.3); }
+  .level-2 { background: radial-gradient(circle, #0a4b32, #020b06); box-shadow: 0 0 14px rgba(0,255,100,0.5); }
+  .level-3 { background: radial-gradient(circle, #0f6b44, #020b06); box-shadow: 0 0 20px rgba(0,255,100,0.8); }
 
-        #cryptoCount {
-            font-size: 22px;
-            margin-bottom: 4px;
-        }
+  /* RAINBOW FALLING COIN */
+  .rainbow-coin {
+    position: fixed;
+    top: -60px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 0deg,
+      #ff0000,
+      #ff7f00,
+      #ffff00,
+      #00ff00,
+      #0000ff,
+      #4b0082,
+      #8f00ff,
+      #ff0000
+    );
+    box-shadow: 0 0 18px rgba(255,255,255,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: #001b0d;
+    cursor: pointer;
+    z-index: 10;
+    animation: rainbowSpin 1.2s linear infinite;
+  }
 
-        #cps {
-            font-size: 14px;
-            color: #ccc;
-            margin-bottom: 20px;
-        }
-
-        #leftInfo {
-            font-size: 13px;
-            color: #ccc;
-            text-align: center;
-        }
-
-        #upgradesTitle {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
-
-        #upgradesList {
-            flex: 1;
-            overflow-y: auto;
-            border: 1px solid #333;
-            border-radius: 6px;
-            padding: 6px;
-            background: #151515;
-        }
-
-        .upgrade {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px;
-            margin-bottom: 4px;
-            border-radius: 4px;
-            background: #202020;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        .upgrade:hover {
-            background: #262626;
-        }
-
-        .upgrade.disabled {
-            opacity: 0.4;
-            cursor: default;
-        }
-
-        .upgrade-name {
-            font-weight: bold;
-        }
-
-        .upgrade-cost {
-            color: #6bff9a;
-        }
-
-        .upgrade-owned {
-            color: #aaa;
-            font-size: 12px;
-        }
-
-        /* Overlays */
-
-        .overlay-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 50;
-        }
-
-        .overlay {
-            background: #1b1b1b;
-            border-radius: 10px;
-            padding: 16px;
-            width: 420px;
-            max-width: 90%;
-            box-shadow: 0 0 20px rgba(0,0,0,0.7);
-            border: 1px solid #333;
-
-            /* slide animation base */
-            transform: translateY(-20px);
-            opacity: 0;
-            transition: opacity 0.25s ease, transform 0.25s ease;
-        }
-
-        .overlay.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .overlay-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .overlay-title {
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .overlay-close {
-            background: transparent;
-            border: none;
-            color: #eee;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .world-card {
-            border-radius: 6px;
-            padding: 8px;
-            margin-bottom: 8px;
-            background: #202020;
-            border: 1px solid #333;
-            cursor: pointer;
-        }
-
-        .world-card.active {
-            border-color: #3aa655;
-            box-shadow: 0 0 10px rgba(58,166,85,0.6);
-        }
-
-        .world-name {
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .world-desc {
-            font-size: 13px;
-            color: #ccc;
-        }
-
-        .ascension-info {
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .ascend-btn {
-            background-color: #b53a3a;
-            border: none;
-            padding: 8px 16px;
-            color: white;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .ascend-btn:hover {
-            background-color: #8d2c2c;
-        }
-
-        .ascension-note {
-            font-size: 12px;
-            color: #ccc;
-            margin-top: 8px;
-        }
-
-        /* Scrollbar small tweak */
-        #upgradesList::-webkit-scrollbar {
-            width: 6px;
-        }
-        #upgradesList::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 3px;
-        }
-    </style>
+  @keyframes rainbowSpin {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+  }
+</style>
 </head>
 <body>
-<div id="gameContainer">
-    <div id="topBar">
-        <div id="title">Crypto Clicker</div>
-        <div id="stats">
-            <span id="statAscensions">Ascensions: 0</span> |
-            <span id="statWorld">World: Green</span>
-        </div>
-        <div id="rightButtons">
-            <button class="nav-btn" id="btnUtilities">Utilities</button>
-            <button class="nav-btn danger" id="btnAscension">Ascension</button>
-            <button class="nav-btn secondary" id="btnWorlds">Worlds</button>
-        </div>
-    </div>
 
-    <div id="leftPanel">
-        <div id="cryptoCount">0 Crypto</div>
-        <div id="cps">0 per second</div>
-        <div id="coin">₿</div>
-        <div id="leftInfo">
-            Click the coin to earn crypto.<br>
-            Buy upgrades to increase your income.
-        </div>
-    </div>
-
-    <div id="rightPanel">
-        <div id="upgradesTitle">Upgrades</div>
-        <div id="upgradesList"></div>
-    </div>
+<div class="left">
+  <div id="bigCoin">₿</div>
+  <div id="balance">0 Crypto</div>
+  <div id="buffStatus"></div>
 </div>
 
-<!-- Worlds Overlay -->
-<div class="overlay-backdrop" id="worldsOverlayBackdrop">
-    <div class="overlay" id="worldsOverlay">
-        <div class="overlay-header">
-            <div class="overlay-title">Worlds</div>
-            <button class="overlay-close" id="closeWorlds">&times;</button>
-        </div>
-        <div class="world-card" data-world="green">
-            <div class="world-name">Green World</div>
-            <div class="world-desc">Balanced growth. Standard income and prices.</div>
-        </div>
-        <div class="world-card" data-world="purple">
-            <div class="world-name">Purple World</div>
-            <div class="world-desc">Higher income, but upgrades cost more.</div>
-        </div>
-    </div>
+<div class="right">
+  <div class="shop-title-row">
+    <div class="shop-title">Crypto Upgrades</div>
+    <button id="utilitiesBtn">Utilities</button>
+  </div>
+  <div id="shop"></div>
 </div>
 
-<!-- Ascension Overlay -->
-<div class="overlay-backdrop" id="ascensionOverlayBackdrop">
-    <div class="overlay" id="ascensionOverlay">
-        <div class="overlay-header">
-            <div class="overlay-title">Ascension</div>
-            <button class="overlay-close" id="closeAscension">&times;</button>
-        </div>
-        <div class="ascension-info">
-            Ascend to reset your progress in exchange for a permanent multiplier.
-        </div>
-        <div class="ascension-info">
-            Current ascension level: <span id="ascensionLevel">0</span><br>
-            Next ascension multiplier: <span id="nextAscensionMult">x1.5</span>
-        </div>
-        <button class="ascend-btn" id="ascendNow">Ascend</button>
-        <div class="ascension-note">
-            Ascension will reset your crypto and upgrades, but increase your overall income permanently.
-        </div>
-    </div>
+<div class="utilities-panel" id="utilitiesPanel">
+  <div class="utilities-header">
+    <div class="utilities-title">Utilities Garden</div>
+    <button id="closeUtilities">Close</button>
+  </div>
+  <div class="garden-container" id="gardenGrid"></div>
 </div>
 
 <script>
-    // Basic game state
-    const state = {
-        crypto: 0,
-        baseClick: 1,
-        baseCps: 0,
-        ascensions: 0,
-        ascensionMult: 1,
-        world: "green",
-        upgrades: [
-            { id: "click1", name: "Better Click", baseCost: 15, level: 0, type: "click", value: 1 },
-            { id: "click2", name: "Golden Click", baseCost: 100, level: 0, type: "click", value: 5 },
-            { id: "miner1", name: "Tiny Miner", baseCost: 50, level: 0, type: "cps", value: 1 },
-            { id: "miner2", name: "GPU Rig", baseCost: 250, level: 0, type: "cps", value: 5 },
-            { id: "miner3", name: "Mining Farm", baseCost: 1000, level: 0, type: "cps", value: 20 }
-        ]
-    };
+/* STATE */
+let balance = 0;
+let basePerClick = 1;
+let incomeMultiplier = 1; // affects clicks + utilities
+let cursorBots = [];
+let lastUpdateTime = Date.now();
+let gardenStartTime = Date.now();
+let buffTimeoutId = null;
+let rainbowCoinActive = false;
 
-    const el = {
-        cryptoCount: document.getElementById("cryptoCount"),
-        cps: document.getElementById("cps"),
-        coin: document.getElementById("coin"),
-        upgradesList: document.getElementById("upgradesList"),
-        statAscensions: document.getElementById("statAscensions"),
-        statWorld: document.getElementById("statWorld"),
-        ascensionLevel: document.getElementById("ascensionLevel"),
-        nextAscensionMult: document.getElementById("nextAscensionMult"),
+const SAVE_KEY = "crypto_clicker_pixel_emoji_rainbow_v2";
 
-        btnWorlds: document.getElementById("btnWorlds"),
-        btnAscension: document.getElementById("btnAscension"),
-        btnUtilities: document.getElementById("btnUtilities"),
+/* PRODUCERS */
+let producers = [
+  { name: "Cursor Bot", baseCost: 15, amount: 0, cps: 0.1, emoji: "🖱️" },
+  { name: "Hobby Miner", baseCost: 100, amount: 0, cps: 1, emoji: "⛏️" },
+  { name: "Mining Farm", baseCost: 1100, amount: 0, cps: 8, emoji: "🏭" },
+  { name: "GPU Factory", baseCost: 12000, amount: 0, cps: 47, emoji: "💻" },
+  { name: "Crypto Mine", baseCost: 130000, amount: 0, cps: 260, emoji: "🪨" },
+  { name: "Server Shipment", baseCost: 1400000, amount: 0, cps: 1400, emoji: "📦" },
+  { name: "Hash Lab", baseCost: 20000000, amount: 0, cps: 7800, emoji: "⚗️" },
+  { name: "Quantum Gateway", baseCost: 330000000, amount: 0, cps: 44000, emoji: "🌀" },
+  { name: "Time Miner", baseCost: 5100000000, amount: 0, cps: 260000, emoji: "⏳" }
+];
 
-        worldsOverlayBackdrop: document.getElementById("worldsOverlayBackdrop"),
-        worldsOverlay: document.getElementById("worldsOverlay"),
-        closeWorlds: document.getElementById("closeWorlds"),
+/* COST */
+function getCost(base, amount) {
+  return Math.floor(base * Math.pow(1.15, amount));
+}
 
-        ascensionOverlayBackdrop: document.getElementById("ascensionOverlayBackdrop"),
-        ascensionOverlay: document.getElementById("ascensionOverlay"),
-        closeAscension: document.getElementById("closeAscension"),
-        ascendNow: document.getElementById("ascendNow"),
+/* UI UPDATE */
+function updateUI() {
+  document.getElementById("balance").textContent = balance.toFixed(1) + " Crypto";
 
-        worldCards: null
-    };
+  const shop = document.getElementById("shop");
+  shop.innerHTML = "";
 
-    function getWorldIncomeMult() {
-        if (state.world === "green") return 1;
-        if (state.world === "purple") return 1.5;
-        return 1;
+  producers.forEach((p, i) => {
+    const cost = getCost(p.baseCost, p.amount);
+
+    const item = document.createElement("div");
+    item.className = "item" + (balance < cost ? " disabled" : "");
+    item.onclick = () => buyProducer(i);
+
+    const icon = document.createElement("div");
+    icon.className = "item-icon";
+    icon.textContent = p.emoji;
+
+    const text = document.createElement("div");
+    text.innerHTML = `
+      <div style="font-weight:bold;color:#aaffc4">${p.name} (${p.amount})</div>
+      <div style="font-size:12px;color:#7aff9d">Generates ${p.cps} crypto/sec</div>
+      <div style="color:#00ff66;font-weight:bold">Cost: ${cost.toLocaleString()}</div>
+    `;
+
+    item.appendChild(icon);
+    item.appendChild(text);
+    shop.appendChild(item);
+  });
+
+  renderGarden();
+  updateBuffStatus();
+}
+
+/* BUFF STATUS TEXT */
+function updateBuffStatus() {
+  const el = document.getElementById("buffStatus");
+  if (incomeMultiplier > 1) {
+    el.textContent = "Rainbow Boost: 10× clicks & utilities for 30s!";
+  } else {
+    el.textContent = "";
+  }
+}
+
+/* BUY */
+function buyProducer(i) {
+  const p = producers[i];
+  const cost = getCost(p.baseCost, p.amount);
+  if (balance < cost) return;
+
+  balance -= cost;
+  p.amount++;
+
+  if (i === 0) spawnCursorBot();
+
+  updateUI();
+  saveGame();
+}
+
+/* CLICK */
+document.getElementById("bigCoin").onclick = () => {
+  balance += basePerClick * incomeMultiplier;
+  updateUI();
+  saveGame();
+};
+
+/* CURSOR BOTS */
+const cursorSVG = `
+<svg viewBox="0 0 24 24">
+  <path d="M3 2 L20 12 L13 13 L15 22 L10 22 L8 13 L3 2 Z"
+        fill="black" stroke="#00ff66" stroke-width="2"/>
+</svg>`;
+
+function spawnCursorBot() {
+  const bot = document.createElement("div");
+  bot.className = "cursorBot";
+  bot.innerHTML = cursorSVG;
+  document.body.appendChild(bot);
+
+  cursorBots.push({
+    el: bot,
+    angle: Math.random() * Math.PI * 2,
+    radius: 170 + cursorBots.length * 12,
+    speed: 0.01 + Math.random() * 0.01
+  });
+}
+
+function animateBots() {
+  const coin = document.getElementById("bigCoin");
+  const rect = coin.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  cursorBots.forEach(bot => {
+    bot.angle += bot.speed;
+    const x = cx + Math.cos(bot.angle) * bot.radius - 16;
+    const y = cy + Math.sin(bot.angle) * bot.radius - 16;
+    bot.el.style.transform = `translate(${x}px, ${y}px)`;
+  });
+
+  requestAnimationFrame(animateBots);
+}
+animateBots();
+
+/* PASSIVE INCOME (AFFECTED BY RAINBOW BUFF) */
+setInterval(() => {
+  const now = Date.now();
+  const delta = (now - lastUpdateTime) / 1000;
+  lastUpdateTime = now;
+
+  let total = 0;
+  producers.forEach(p => total += p.amount * p.cps);
+  balance += total * delta * incomeMultiplier;
+
+  updateUI();
+  saveGame();
+}, 1000);
+
+/* UTILITIES PANEL */
+document.getElementById("utilitiesBtn").onclick = () =>
+  document.getElementById("utilitiesPanel").classList.add("open");
+
+document.getElementById("closeUtilities").onclick = () =>
+  document.getElementById("utilitiesPanel").classList.remove("open");
+
+/* EVOLUTION */
+function getEvolutionLevel() {
+  const minutes = (Date.now() - gardenStartTime) / 60000;
+  return Math.min(3, Math.floor(minutes / 30));
+}
+
+/* GARDEN RENDER */
+function renderGarden() {
+  const grid = document.getElementById("gardenGrid");
+  grid.innerHTML = "";
+
+  const level = getEvolutionLevel();
+
+  producers.forEach(p => {
+    if (p.amount <= 0) return;
+
+    const row = document.createElement("div");
+    row.className = "garden-row";
+
+    for (let i = 0; i < p.amount; i++) {
+      const tile = document.createElement("div");
+      tile.className = "garden-tile level-" + level;
+
+      const emoji = document.createElement("div");
+      emoji.className = "tile-emoji";
+      emoji.textContent = p.emoji;
+
+      tile.appendChild(emoji);
+      row.appendChild(tile);
     }
 
-    function getWorldCostMult() {
-        if (state.world === "green") return 1;
-        if (state.world === "purple") return 1.4;
-        return 1;
+    grid.appendChild(row);
+  });
+}
+
+/* RAINBOW FALLING COIN LOGIC */
+function spawnRainbowCoin() {
+  if (rainbowCoinActive) return;
+  rainbowCoinActive = true;
+
+  const coin = document.createElement("div");
+  coin.className = "rainbow-coin";
+  coin.textContent = "₿";
+
+  const screenWidth = window.innerWidth;
+  const x = Math.random() * (screenWidth - 60) + 10;
+  coin.style.left = x + "px";
+
+  document.body.appendChild(coin);
+
+  const fallDuration = 4000; // 4 seconds
+  const startTime = performance.now();
+
+  function fallStep(now) {
+    const t = (now - startTime) / fallDuration;
+    if (!document.body.contains(coin)) return;
+
+    const y = t * (window.innerHeight + 80) - 60;
+    coin.style.top = y + "px";
+
+    if (t >= 1) {
+      // fell off screen
+      document.body.removeChild(coin);
+      rainbowCoinActive = false;
+      return;
     }
+    requestAnimationFrame(fallStep);
+  }
+  requestAnimationFrame(fallStep);
 
-    function getAscensionMult() {
-        return 1 + state.ascensions * 0.5;
-    }
+  coin.addEventListener("click", () => {
+    if (!document.body.contains(coin)) return;
+    document.body.removeChild(coin);
+    rainbowCoinActive = false;
+    triggerRainbowBuff();
+  });
+}
 
-    function getClickPower() {
-        let base = state.baseClick;
-        state.upgrades.forEach(u => {
-            if (u.type === "click") base += u.level * u.value;
-        });
-        return base * getWorldIncomeMult() * getAscensionMult();
-    }
+function triggerRainbowBuff() {
+  incomeMultiplier = 10; // 10x clicks + utilities
+  updateBuffStatus();
 
-    function getCps() {
-        let cps = state.baseCps;
-        state.upgrades.forEach(u => {
-            if (u.type === "cps") cps += u.level * u.value;
-        });
-        return cps * getWorldIncomeMult() * getAscensionMult();
-    }
+  if (buffTimeoutId) clearTimeout(buffTimeoutId);
+  buffTimeoutId = setTimeout(() => {
+    incomeMultiplier = 1;
+    buffTimeoutId = null;
+    updateBuffStatus();
+  }, 30000); // 30 seconds
+}
 
-    function format(num) {
-        if (num >= 1e9) return (num / 1e9).toFixed(2) + "B";
-        if (num >= 1e6) return (num / 1e6).toFixed(2) + "M";
-        if (num >= 1e3) return (num / 1e3).toFixed(2) + "K";
-        return num.toFixed(0);
-    }
+/* RANDOM SPAWN CHECK: 1 IN 100 CHANCE EVERY SECOND */
+setInterval(() => {
+  const roll = Math.floor(Math.random() * 100); // 0–99
+  if (roll === 0) {
+    spawnRainbowCoin();
+  }
+}, 1000);
 
-    function updateUI() {
-        el.cryptoCount.textContent = format(state.crypto) + " Crypto";
-        el.cps.textContent = format(getCps()) + " per second";
-        el.statAscensions.textContent = "Ascensions: " + state.ascensions;
-        el.statWorld.textContent = "World: " + (state.world === "green" ? "Green" : "Purple");
-        el.ascensionLevel.textContent = state.ascensions;
-        el.nextAscensionMult.textContent = "x" + (1 + (state.ascensions + 1) * 0.5).toFixed(1);
+/* SAVE / LOAD */
+function saveGame() {
+  localStorage.setItem(SAVE_KEY, JSON.stringify({
+    balance,
+    producers: producers.map(p => p.amount),
+    lastUpdateTime,
+    gardenStartTime
+  }));
+}
 
-        // Update upgrades
-        el.upgradesList.innerHTML = "";
-        state.upgrades.forEach(u => {
-            const cost = Math.floor(u.baseCost * Math.pow(1.15, u.level) * getWorldCostMult());
-            const canAfford = state.crypto >= cost;
+function loadGame() {
+  const raw = localStorage.getItem(SAVE_KEY);
+  if (!raw) {
+    lastUpdateTime = Date.now();
+    gardenStartTime = Date.now();
+    return;
+  }
+  const data = JSON.parse(raw);
 
-            const div = document.createElement("div");
-            div.className = "upgrade" + (canAfford ? "" : " disabled");
-
-            const left = document.createElement("div");
-            const name = document.createElement("div");
-            name.className = "upgrade-name";
-            name.textContent = u.name;
-            const owned = document.createElement("div");
-            owned.className = "upgrade-owned";
-            owned.textContent = "Owned: " + u.level;
-            left.appendChild(name);
-            left.appendChild(owned);
-
-            const right = document.createElement("div");
-            right.className = "upgrade-cost";
-            right.textContent = format(cost) + " Crypto";
-
-            div.appendChild(left);
-            div.appendChild(right);
-
-            if (canAfford) {
-                div.addEventListener("click", () => {
-                    if (state.crypto >= cost) {
-                        state.crypto -= cost;
-                        u.level++;
-                        updateUI();
-                    }
-                });
-            }
-
-            el.upgradesList.appendChild(div);
-        });
-
-        // World cards active state
-        if (!el.worldCards) {
-            el.worldCards = document.querySelectorAll(".world-card");
-        }
-        el.worldCards.forEach(card => {
-            const w = card.getAttribute("data-world");
-            if (w === state.world) card.classList.add("active");
-            else card.classList.remove("active");
-        });
-    }
-
-    // Coin click
-    el.coin.addEventListener("click", () => {
-        state.crypto += getClickPower();
-        updateUI();
+  balance = data.balance || 0;
+  if (Array.isArray(data.producers)) {
+    data.producers.forEach((amt, i) => {
+      if (producers[i]) producers[i].amount = amt || 0;
     });
+  }
 
-    // Passive income
-    setInterval(() => {
-        state.crypto += getCps() / 10;
-        updateUI();
-    }, 100);
+  lastUpdateTime = data.lastUpdateTime || Date.now();
+  gardenStartTime = data.gardenStartTime || Date.now();
 
-    // Overlay helpers
-    function openOverlay(backdropEl, overlayEl) {
-        backdropEl.style.display = "flex";
-        requestAnimationFrame(() => {
-            overlayEl.classList.add("show");
-        });
-    }
+  const delta = (Date.now() - lastUpdateTime) / 1000;
+  let total = 0;
+  producers.forEach(p => total += p.amount * p.cps);
+  balance += total * delta; // offline income (no buff while closed)
 
-    function closeOverlay(backdropEl, overlayEl) {
-        overlayEl.classList.remove("show");
-        setTimeout(() => {
-            backdropEl.style.display = "none";
-        }, 250);
-    }
+  for (let i = 0; i < producers[0].amount; i++) spawnCursorBot();
+}
 
-    // Worlds overlay
-    el.btnWorlds.addEventListener("click", () => {
-        openOverlay(el.worldsOverlayBackdrop, el.worldsOverlay);
-    });
-
-    el.closeWorlds.addEventListener("click", () => {
-        closeOverlay(el.worldsOverlayBackdrop, el.worldsOverlay);
-    });
-
-    el.worldsOverlayBackdrop.addEventListener("click", (e) => {
-        if (e.target === el.worldsOverlayBackdrop) {
-            closeOverlay(el.worldsOverlayBackdrop, el.worldsOverlay);
-        }
-    });
-
-    // World switching
-    document.querySelectorAll(".world-card").forEach(card => {
-        card.addEventListener("click", () => {
-            const w = card.getAttribute("data-world");
-            state.world = w;
-            updateUI();
-        });
-    });
-
-    // Ascension overlay
-    el.btnAscension.addEventListener("click", () => {
-        openOverlay(el.ascensionOverlayBackdrop, el.ascensionOverlay);
-    });
-
-    el.closeAscension.addEventListener("click", () => {
-        closeOverlay(el.ascensionOverlayBackdrop, el.ascensionOverlay);
-    });
-
-    el.ascensionOverlayBackdrop.addEventListener("click", (e) => {
-        if (e.target === el.ascensionOverlayBackdrop) {
-            closeOverlay(el.ascensionOverlayBackdrop, el.ascensionOverlay);
-        }
-    });
-
-    // Ascend
-    el.ascendNow.addEventListener("click", () => {
-        if (state.crypto < 1000) return; // simple requirement
-        state.ascensions++;
-        state.crypto = 0;
-        state.upgrades.forEach(u => u.level = 0);
-        closeOverlay(el.ascensionOverlayBackdrop, el.ascensionOverlay);
-        updateUI();
-    });
-
-    // Utilities button (placeholder)
-    el.btnUtilities.addEventListener("click", () => {
-        alert("Utilities panel not implemented yet in this version.");
-    });
-
-    // Init
-    updateUI();
+loadGame();
+updateUI();
 </script>
+
 </body>
 </html>
