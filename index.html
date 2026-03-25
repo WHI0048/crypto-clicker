@@ -1,26 +1,567 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Crypto Clicker</title>
-
 <style>
-/* ——————————— YOUR FULL READABLE CSS (unchanged) ——————————— */
-:root { --bg:#050712; --panel:rgba(15,20,40,0.9); --accent:#35e6a8; --accent-soft:rgba(53,230,168,0.2); --accent-strong:#35e6ff; --text:#f5f7ff; --muted:#9aa0c2; --danger:#ff4f6b; --purple:#b35cff; --purple-soft:rgba(179,92,255,0.2); --shadow-soft:0 0 30px rgba(0,0,0,0.6); --radius:18px; }
-*{box-sizing:border-box;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
-body{margin:0;background:radial-gradient(circle at top,#151a33 0,#050712 55%,#02030a 100%);color:var(--text);min-height:100vh;display:flex;justify-content:center;align-items:stretch;}
-/* (CSS continues exactly as in your raw file…) */
-</style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #020b06;
+    color: #d4ffd9;
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
 
+  /* LEFT SIDE */
+  .left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* RIGHT SIDE SHOP */
+  .right {
+    width: 380px;
+    background: #03140d;
+    border-left: 3px solid #0f3d2a;
+    overflow-y: auto;
+    padding: 10px;
+    position: relative;
+    z-index: 5;
+  }
+
+  /* BIG COIN */
+  #bigCoin {
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #00ff66, #00cc55, #006633);
+    box-shadow: 0 0 40px rgba(0, 255, 100, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.05s ease;
+    color: #001b0d;
+    position: relative;
+    z-index: 2;
+  }
+  #bigCoin:active { transform: scale(0.96); }
+
+  #balance {
+    margin-top: 20px;
+    font-size: 32px;
+    font-weight: bold;
+    text-shadow: 0 0 10px #00ff66;
+  }
+
+  /* BUFF INDICATOR */
+  #buffStatus {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #7aff9d;
+    text-shadow: 0 0 6px rgba(0,255,100,0.6);
+  }
+
+  /* CURSOR BOTS */
+  .cursorBot {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .cursorBot svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 6px #00ff66);
+  }
+
+  /* SHOP */
+  .shop-title-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .shop-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #7aff9d;
+    text-shadow: 0 0 10px #00ff66;
+  }
+  #utilitiesBtn {
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid #00ff66;
+    background: #041b12;
+    color: #aaffc4;
+    cursor: pointer;
+  }
+
+  .item {
+    background: #062016;
+    padding: 8px 10px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    border: 1px solid #0f3d2a;
+    display: flex;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .item.disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+
+  /* UTILITIES PANEL */
+  .utilities-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    height: 100vh;
+    background: radial-gradient(circle at top, #022015, #010806);
+    border-left: 2px solid #00ff66;
+    transform: translateX(100%);
+    transition: transform 0.4s ease;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+  }
+  .utilities-panel.open { transform: translateX(0); }
+
+  .utilities-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .utilities-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #7aff9d;
+    text-shadow: 0 0 8px #00ff66;
+  }
+
+  /* GARDEN */
+  .garden-container {
+    flex: 1;
+    border-radius: 12px;
+    border: 1px solid #0f3d2a;
+    background: repeating-linear-gradient(
+      45deg,
+      #02140c 0,
+      #02140c 10px,
+      #031b11 10px,
+      #031b11 20px
+    );
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow: auto;
+  }
+
+  .garden-row {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding: 2px 0;
+  }
+
+  .garden-tile {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: 1px solid #0f3d2a;
+    background: #04150e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tile-emoji {
+    font-size: 24px;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 0 4px rgba(0,255,100,0.4));
+  }
+
+  /* EVOLUTION */
+  .level-0 { background: radial-gradient(circle, #02140c, #020b06); }
+  .level-1 { background: radial-gradient(circle, #063322, #020b06); box-shadow: 0 0 8px rgba(0,255,100,0.3); }
+  .level-2 { background: radial-gradient(circle, #0a4b32, #020b06); box-shadow: 0 0 14px rgba(0,255,100,0.5); }
+  .level-3 { background: radial-gradient(circle, #0f6b44, #020b06); box-shadow: 0 0 20px rgba(0,255,100,0.8); }
+
+  /* RAINBOW FALLING COIN */
+  .rainbow-coin {
+    position: fixed;
+    top: -60px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 0deg,
+      #ff0000,
+      #ff7f00,
+      #ffff00,
+      #00ff00,
+      #0000ff,
+      #4b0082,
+      #8f00ff,
+      #ff0000
+    );
+    box-shadow: 0 0 18px rgba(255,255,255,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: #001b0d;
+    cursor: pointer;
+    z-index: 10;
+    animation: rainbowSpin 1.2s linear infinite;
+  }
+
+  @keyframes rainbowSpin {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+  }
+</style>
 </head>
 <body>
 
-<!-- ——————————— MINIFIED HTML ——————————— -->
-<div class="game-shell"><div class="top-bar"><div class="title-block"><h1>Crypto Clicker</h1><span>Worlds • Ascension • Pixel‑Portal</span></div><div class="nav-buttons"><button class="nav-btn" id="btnUtilities"><span class="icon">🛠</span><span>Utilities</span></button><button class="nav-btn danger" id="btnAscension"><span class="icon">✨</span><span>Ascension</span></button><button class="nav-btn secondary" id="btnWorlds"><span class="icon">🌐</span><span>Worlds</span></button></div></div><div class="main-grid"><div class="panel"><div class="panel-inner"><div class="panel-header"><h2>Crypto Core</h2><span id="worldLabel">World 1 • Green Crypto</span></div><div class="crypto-display"><div class="world-label" id="worldStatusLabel">Current World: 1</div><div class="crypto-count" id="cryptoCount">0</div><div class="crypto-per-sec" id="cryptoPerSec">0 / sec</div><div class="crypto-coin" id="cryptoCoin"></div></div><div class="status-bar"><div class="status-pill">Ascensions: <strong id="ascensionCount">0</strong></div><div class="status-pill purple">World 2: <strong id="world2Status">Locked</strong></div><div class="status-pill">Timer Miner: <strong id="timerMinerStatus">Not Owned</strong></div></div></div></div><div class="panel"><div class="panel-inner"><div class="panel-header"><h2>Upgrades</h2><span>Clickers • Miners • Timer Miner</span></div><div class="upgrades-list" id="upgradesList"></div></div></div></div></div><div class="overlay" id="ascensionOverlay"><div class="overlay-inner"><div class="overlay-content"><div class="overlay-header"><h2>Ascension</h2><button class="overlay-close" id="ascensionClose">×</button></div><div class="ascension-center"><div class="ascension-count">Ascensions: <strong id="ascensionCountOverlay">0</strong></div><div class="ascension-warning">Ascending will reset all coins, upgrades, and world progress.<br>Only your Ascension count will remain.</div><div class="rainbow-crypto" id="rainbowCrypto"><div class="rainbow-crypto-inner"></div></div><div class="ascension-message" id="ascensionMessage"></div></div></div></div></div><div class="overlay" id="worldsOverlay"><div class="overlay-inner"><div class="overlay-content"><div class="overlay-header"><h2>Worlds</h2><button class="overlay-close" id="worldsClose">×</button></div><div class="worlds-grid"><div class="world-card"><div class="world-main"><div class="world-name">World 1 • Green Crypto</div><div class="world-status">Status: <span class="unlocked">Unlocked</span></div><div class="world-pill">Base world • Standard upgrades</div></div><button class="world-select-btn" id="selectWorld1">Enter</button></div><div class="world-card"><div class="world-main"><div class="world-name">World 2 • Purple Crypto</div><div class="world-status">Status: <span id="world2LockLabel" class="locked">Locked • Requires 2+ Ascensions</span></div><div class="world-pill purple">Amplified world • Stronger upgrades</div></div><button class="world-select-btn" id="selectWorld2" disabled>Enter</button></div></div></div></div></div>
+<div class="left">
+  <div id="bigCoin">₿</div>
+  <div id="balance">0 Crypto</div>
+  <div id="buffStatus"></div>
+</div>
 
-<!-- ——————————— FULLY MINIFIED JAVASCRIPT ——————————— -->
+<div class="right">
+  <div class="shop-title-row">
+    <div class="shop-title">Crypto Upgrades</div>
+    <button id="utilitiesBtn">Utilities</button>
+  </div>
+  <div id="shop"></div>
+</div>
+
+<div class="utilities-panel" id="utilitiesPanel">
+  <div class="utilities-header">
+    <div class="utilities-title">Utilities Garden</div>
+    <button id="closeUtilities">Close</button>
+  </div>
+  <div class="garden-container" id="gardenGrid"></div>
+</div>
+
 <script>
-(function(){const e={ascensions:0,currentWorld:1,worlds:{1:{name:"World 1",color:"green",coins:0,perClick:1,perSecond:0,upgrades:{}},2:{name:"World 2",color:"purple",coins:0,perClick:1,perSecond:0,upgrades:{}}},upgradesConfig:{1:[{id:"clickBoost",name:"Click Boost",desc:"+1 per click",baseCost:10,costMult:1.5,type:"click",value:1},{id:"autoMiner",name:"Auto Miner",desc:"+1 per second",baseCost:50,costMult:1.6,type:"auto",value:1},{id:"timerMiner",name:"Timer Miner",desc:"Required to trade for Ascension",baseCost:200,costMult:1.8,type:"timer",value:0}],2:[{id:"clickBoost2",name:"Quantum Click Boost",desc:"+3 per click",baseCost:100,costMult:1.6,type:"click",value:3},{id:"autoMiner2",name:"Void Miner",desc:"+4 per second",baseCost:250,costMult:1.7,type:"auto",value:4},{id:"timerMiner",name:"Timer Miner",desc:"Required to trade for Ascension",baseCost:200,costMult:1.8,type:"timer",value:0}]}},t={cryptoCoin:document.getElementById("cryptoCoin"),cryptoCount:document.getElementById("cryptoCount"),cryptoPerSec:document.getElementById("cryptoPerSec"),worldLabel:document.getElementById("worldLabel"),worldStatusLabel:document.getElementById("worldStatusLabel"),ascensionCount:document.getElementById("ascensionCount"),ascensionCountOverlay:document.getElementById("ascensionCountOverlay"),world2Status:document.getElementById("world2Status"),timerMinerStatus:document.getElementById("timerMinerStatus"),upgradesList:document.getElementById("upgradesList"),btnAscension:document.getElementById("btnAscension"),btnWorlds:document.getElementById("btnWorlds"),ascensionOverlay:document.getElementById("ascensionOverlay"),ascensionClose:document.getElementById("ascensionClose"),rainbowCrypto:document.getElementById("rainbowCrypto"),ascensionMessage:document.getElementById("ascensionMessage"),worldsOverlay:document.getElementById("worldsOverlay"),worldsClose:document.getElementById("worldsClose"),selectWorld1:document.getElementById("selectWorld1"),selectWorld2:document.getElementById("selectWorld2"),world2LockLabel:document.getElementById("world2LockLabel")};function n(t){const n=e.worlds[t];n.upgrades&&Object.keys(n.upgrades).length!==0||e.upgradesConfig[t].forEach((e=>{n.upgrades[e.id]={level:0,cost:e.baseCost}}))}function o(){return e.worlds[e.currentWorld]}function s(e){return e>=1e9?(e/1e9).toFixed(2)+"B":e>=1e6?(e/1e6).toFixed(2)+"M":e>=1e3?(e/1e3).toFixed(2)+"K":Math.floor(e).toString()}function r(t){const n=e.worlds[t];let o=0;e.upgradesConfig[t].forEach((e=>{const t=n.upgrades[e.id];"auto"===e.type&&(o+=e.value*t.level)})),n.perSecond=o}function c(t){const n=e.worlds[t];let o=1;e.upgradesConfig[t].forEach((e=>{const t=n.upgrades[e.id];"click"===e.type&&(o+=e.value*t.level)})),n.perClick=o}function a(){const t=o().upgrades.timerMiner;return t&&t.level>0}function i(){const n=o();t.cryptoCount.textContent=s(n.coins),t.cryptoPerSec.textContent=n.perSecond+" / sec",t.ascensionCount.textContent=e.ascensions,t.ascensionCountOverlay.textContent=e.ascensions;const i=e.ascensions>=2;t.world2Status.textContent=i?"Unlocked":"Locked",t.world2Status.style.color=i?"var(--accent)":"var(--danger)",t.world2LockLabel.textContent=i?"Unlocked":"Locked • Requires 2+ Ascensions",t.world2LockLabel.className=i?"unlocked":"locked",t.selectWorld2.disabled=!i,t.timerMinerStatus.textContent=a()?"Owned":"Not Owned",t.timerMinerStatus.style.color=a()?"var(--accent)":"var(--muted)","1"===String(e.currentWorld)?(t.cryptoCoin.classList.remove("purple"),t.worldLabel.textContent="World 1 • Green Crypto",t.worldStatusLabel.textContent="Current World: 1"):(t.cryptoCoin.classList.add("purple"),t.worldLabel.textContent="World 2 • Purple Crypto",t.worldStatusLabel.textContent="Current World: 2"),l()}function l(){const t=e.currentWorld,n=e.worlds[t],o=e.upgradesConfig[t];t.upgradesList.innerHTML="",o.forEach((o=>{const a=n.upgrades[o.id],l=document.createElement("div");l.className="upgrade-item";const d=document.createElement("div");d.className="upgrade-main";const u=document.createElement("div");u.className="upgrade-name",u.textContent=o.name;const m=document.createElement("div");m.className="upgrade-desc",m.textContent=o.desc,d.appendChild(u),d.appendChild(m);const p=document.createElement("div");p.className="upgrade-meta";const g=document.createElement("div");g.className="upgrade-cost",g.textContent="Cost: "+s(a.cost);const y=document.createElement("div");y.className="upgrade-owned",y.textContent="Owned: "+a.level;const C=document.createElement("button");C.className="upgrade-btn",C.textContent="Buy",C.disabled=n.coins<a.cost,C.addEventListener("click",(()=>{n.coins>=a.cost&&(n.coins-=a.cost,a.level+=1,a.cost=Math.ceil(a.cost*o.costMult),"click"===o.type?c(t):"auto"===o.type&&r(t),"timerMiner"===o.id&&(t.timerMinerStatus.textContent="Owned",t.timerMinerStatus.style.color="var(--accent)"),i())})),p.appendChild(g),p.appendChild(y),p.appendChild(C),l.appendChild(d),l.appendChild(p),t.upgradesList.appendChild(l)}))}function d(e,n,o){const s=document.createElement("div");s.className="click-fx",s.textContent="+"+o,s.style.left=e+"px",s.style.top=n+"px",t.cryptoCoin.appendChild(s),setTimeout((()=>s.remove()),600)}function u(t){Object.keys(e.worlds).forEach((n=>{const o=e.worlds[parseInt(n,10)];o.perSecond>0&&(o.coins+=o.perSecond*t)})),i()}let m=performance.now();function p(e){const t=(e-m)/1e3;m=e,u(t),requestAnimationFrame(p)}function g(){t.ascensionMessage.textContent="",t.ascensionMessage.className="ascension-message",t.ascensionOverlay.classList.add("show")}function y(){t.ascensionOverlay.classList.remove("show")}function C(){t.worldsOverlay.classList.add("show")}function f(){t.worldsOverlay.classList.remove("show")}function v(){if(!a())return t.ascensionMessage.textContent="You need Timer Miner before you can trade for an Ascension.",void(t.ascensionMessage.className="ascension-message error");e.ascensions+=1,Object.keys(e.worlds).forEach((t=>{const n=e.worlds[parseInt(t,10)];n.coins=0,n.perClick=1,n.perSecond=0,n.upgrades={},n(parseInt(t,10)),c(parseInt(t,10)),r(parseInt(t,10))})),e.currentWorld=1,t.ascensionMessage.textContent="Ascended! All progress reset. Ascensions: "+e.ascensions,t.ascensionMessage.className="ascension-message success",setTimeout((()=>{y(),i()}),700)}!function(){n(1),n(2),c(1),r(1),c(2),r(2),i(),t.cryptoCoin.addEventListener("click",(e=>{const t=o(),n=t.perClick,o=t.cryptoCoin.getBoundingClientRect(),s=e.clientX-o.left,r=e.clientY-o.top;t.coins+=n,d(s,r,n),i()})),t.btnAscension.addEventListener("click",(()=>{g()})),t.ascensionClose.addEventListener("click",(()=>{y()})),t.rainbowCrypto.addEventListener("click",(()=>{v()})),t.btnWorlds.addEventListener("click",(()=>{C()})),t.worldsClose.addEventListener("click",(()=>{f()})),t.selectWorld1.addEventListener("click",(()=>{e.currentWorld=1,f(),i()})),t.selectWorld2.addEventListener("click",(()=>{e.ascensions>=2&&(e.currentWorld=2,f(),i())})),requestAnimationFrame(p)}()})();
+/* STATE */
+let balance = 0;
+let basePerClick = 1;
+let incomeMultiplier = 1; // affects clicks + utilities
+let cursorBots = [];
+let lastUpdateTime = Date.now();
+let gardenStartTime = Date.now();
+let buffTimeoutId = null;
+let rainbowCoinActive = false;
+
+const SAVE_KEY = "crypto_clicker_pixel_emoji_rainbow_v2";
+
+/* PRODUCERS */
+let producers = [
+  { name: "Cursor Bot", baseCost: 15, amount: 0, cps: 0.1, emoji: "🖱️" },
+  { name: "Hobby Miner", baseCost: 100, amount: 0, cps: 1, emoji: "⛏️" },
+  { name: "Mining Farm", baseCost: 1100, amount: 0, cps: 8, emoji: "🏭" },
+  { name: "GPU Factory", baseCost: 12000, amount: 0, cps: 47, emoji: "💻" },
+  { name: "Crypto Mine", baseCost: 130000, amount: 0, cps: 260, emoji: "🪨" },
+  { name: "Server Shipment", baseCost: 1400000, amount: 0, cps: 1400, emoji: "📦" },
+  { name: "Hash Lab", baseCost: 20000000, amount: 0, cps: 7800, emoji: "⚗️" },
+  { name: "Quantum Gateway", baseCost: 330000000, amount: 0, cps: 44000, emoji: "🌀" },
+  { name: "Time Miner", baseCost: 5100000000, amount: 0, cps: 260000, emoji: "⏳" }
+];
+
+/* COST */
+function getCost(base, amount) {
+  return Math.floor(base * Math.pow(1.15, amount));
+}
+
+/* UI UPDATE */
+function updateUI() {
+  document.getElementById("balance").textContent = balance.toFixed(1) + " Crypto";
+
+  const shop = document.getElementById("shop");
+  shop.innerHTML = "";
+
+  producers.forEach((p, i) => {
+    const cost = getCost(p.baseCost, p.amount);
+
+    const item = document.createElement("div");
+    item.className = "item" + (balance < cost ? " disabled" : "");
+    item.onclick = () => buyProducer(i);
+
+    const icon = document.createElement("div");
+    icon.className = "item-icon";
+    icon.textContent = p.emoji;
+
+    const text = document.createElement("div");
+    text.innerHTML = `
+      <div style="font-weight:bold;color:#aaffc4">${p.name} (${p.amount})</div>
+      <div style="font-size:12px;color:#7aff9d">Generates ${p.cps} crypto/sec</div>
+      <div style="color:#00ff66;font-weight:bold">Cost: ${cost.toLocaleString()}</div>
+    `;
+
+    item.appendChild(icon);
+    item.appendChild(text);
+    shop.appendChild(item);
+  });
+
+  renderGarden();
+  updateBuffStatus();
+}
+
+/* BUFF STATUS TEXT */
+function updateBuffStatus() {
+  const el = document.getElementById("buffStatus");
+  if (incomeMultiplier > 1) {
+    el.textContent = "Rainbow Boost: 10× clicks & utilities for 30s!";
+  } else {
+    el.textContent = "";
+  }
+}
+
+/* BUY */
+function buyProducer(i) {
+  const p = producers[i];
+  const cost = getCost(p.baseCost, p.amount);
+  if (balance < cost) return;
+
+  balance -= cost;
+  p.amount++;
+
+  if (i === 0) spawnCursorBot();
+
+  updateUI();
+  saveGame();
+}
+
+/* CLICK */
+document.getElementById("bigCoin").onclick = () => {
+  balance += basePerClick * incomeMultiplier;
+  updateUI();
+  saveGame();
+};
+
+/* CURSOR BOTS */
+const cursorSVG = `
+<svg viewBox="0 0 24 24">
+  <path d="M3 2 L20 12 L13 13 L15 22 L10 22 L8 13 L3 2 Z"
+        fill="black" stroke="#00ff66" stroke-width="2"/>
+</svg>`;
+
+function spawnCursorBot() {
+  const bot = document.createElement("div");
+  bot.className = "cursorBot";
+  bot.innerHTML = cursorSVG;
+  document.body.appendChild(bot);
+
+  cursorBots.push({
+    el: bot,
+    angle: Math.random() * Math.PI * 2,
+    radius: 170 + cursorBots.length * 12,
+    speed: 0.01 + Math.random() * 0.01
+  });
+}
+
+function animateBots() {
+  const coin = document.getElementById("bigCoin");
+  const rect = coin.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  cursorBots.forEach(bot => {
+    bot.angle += bot.speed;
+    const x = cx + Math.cos(bot.angle) * bot.radius - 16;
+    const y = cy + Math.sin(bot.angle) * bot.radius - 16;
+    bot.el.style.transform = `translate(${x}px, ${y}px)`;
+  });
+
+  requestAnimationFrame(animateBots);
+}
+animateBots();
+
+/* PASSIVE INCOME (AFFECTED BY RAINBOW BUFF) */
+setInterval(() => {
+  const now = Date.now();
+  const delta = (now - lastUpdateTime) / 1000;
+  lastUpdateTime = now;
+
+  let total = 0;
+  producers.forEach(p => total += p.amount * p.cps);
+  balance += total * delta * incomeMultiplier;
+
+  updateUI();
+  saveGame();
+}, 1000);
+
+/* UTILITIES PANEL */
+document.getElementById("utilitiesBtn").onclick = () =>
+  document.getElementById("utilitiesPanel").classList.add("open");
+
+document.getElementById("closeUtilities").onclick = () =>
+  document.getElementById("utilitiesPanel").classList.remove("open");
+
+/* EVOLUTION */
+function getEvolutionLevel() {
+  const minutes = (Date.now() - gardenStartTime) / 60000;
+  return Math.min(3, Math.floor(minutes / 30));
+}
+
+/* GARDEN RENDER */
+function renderGarden() {
+  const grid = document.getElementById("gardenGrid");
+  grid.innerHTML = "";
+
+  const level = getEvolutionLevel();
+
+  producers.forEach(p => {
+    if (p.amount <= 0) return;
+
+    const row = document.createElement("div");
+    row.className = "garden-row";
+
+    for (let i = 0; i < p.amount; i++) {
+      const tile = document.createElement("div");
+      tile.className = "garden-tile level-" + level;
+
+      const emoji = document.createElement("div");
+      emoji.className = "tile-emoji";
+      emoji.textContent = p.emoji;
+
+      tile.appendChild(emoji);
+      row.appendChild(tile);
+    }
+
+    grid.appendChild(row);
+  });
+}
+
+/* RAINBOW FALLING COIN LOGIC */
+function spawnRainbowCoin() {
+  if (rainbowCoinActive) return;
+  rainbowCoinActive = true;
+
+  const coin = document.createElement("div");
+  coin.className = "rainbow-coin";
+  coin.textContent = "₿";
+
+  const screenWidth = window.innerWidth;
+  const x = Math.random() * (screenWidth - 60) + 10;
+  coin.style.left = x + "px";
+
+  document.body.appendChild(coin);
+
+  const fallDuration = 4000; // 4 seconds
+  const startTime = performance.now();
+
+  function fallStep(now) {
+    const t = (now - startTime) / fallDuration;
+    if (!document.body.contains(coin)) return;
+
+    const y = t * (window.innerHeight + 80) - 60;
+    coin.style.top = y + "px";
+
+    if (t >= 1) {
+      // fell off screen
+      document.body.removeChild(coin);
+      rainbowCoinActive = false;
+      return;
+    }
+    requestAnimationFrame(fallStep);
+  }
+  requestAnimationFrame(fallStep);
+
+  coin.addEventListener("click", () => {
+    if (!document.body.contains(coin)) return;
+    document.body.removeChild(coin);
+    rainbowCoinActive = false;
+    triggerRainbowBuff();
+  });
+}
+
+function triggerRainbowBuff() {
+  incomeMultiplier = 10; // 10x clicks + utilities
+  updateBuffStatus();
+
+  if (buffTimeoutId) clearTimeout(buffTimeoutId);
+  buffTimeoutId = setTimeout(() => {
+    incomeMultiplier = 1;
+    buffTimeoutId = null;
+    updateBuffStatus();
+  }, 30000); // 30 seconds
+}
+
+/* RANDOM SPAWN CHECK: 1 IN 100 CHANCE EVERY SECOND */
+setInterval(() => {
+  const roll = Math.floor(Math.random() * 100); // 0–99
+  if (roll === 0) {
+    spawnRainbowCoin();
+  }
+}, 1000);
+
+/* SAVE / LOAD */
+function saveGame() {
+  localStorage.setItem(SAVE_KEY, JSON.stringify({
+    balance,
+    producers: producers.map(p => p.amount),
+    lastUpdateTime,
+    gardenStartTime
+  }));
+}
+
+function loadGame() {
+  const raw = localStorage.getItem(SAVE_KEY);
+  if (!raw) {
+    lastUpdateTime = Date.now();
+    gardenStartTime = Date.now();
+    return;
+  }
+  const data = JSON.parse(raw);
+
+  balance = data.balance || 0;
+  if (Array.isArray(data.producers)) {
+    data.producers.forEach((amt, i) => {
+      if (producers[i]) producers[i].amount = amt || 0;
+    });
+  }
+
+  lastUpdateTime = data.lastUpdateTime || Date.now();
+  gardenStartTime = data.gardenStartTime || Date.now();
+
+  const delta = (Date.now() - lastUpdateTime) / 1000;
+  let total = 0;
+  producers.forEach(p => total += p.amount * p.cps);
+  balance += total * delta; // offline income (no buff while closed)
+
+  for (let i = 0; i < producers[0].amount; i++) spawnCursorBot();
+}
+
+loadGame();
+updateUI();
 </script>
 
 </body>
